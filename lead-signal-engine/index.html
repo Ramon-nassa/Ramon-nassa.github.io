@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lead Signal Engine · paid campaigns that find who actually converts</title>
+<meta name="description" content="Your qualified leads go back to Meta and Google Ads, so the campaign learns who to find next. A small fixed-price pilot, built by Ramon Nassaralla.">
+<meta property="og:title" content="Lead Signal Engine · paid campaigns that find who actually converts">
+<meta property="og:description" content="Sales says the leads are bad. The ad platform thinks they are great. Fix the signal, not the sales team.">
+<meta property="og:image" content="media/poster.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400&family=IBM+Plex+Mono:wght@400;500;600&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f3ecdf; --card:#fbf6ec; --soft:#f8f2e6; --shade:#e3d8c2;
+  --ink:#1c1a18; --mute:#6f6656; --faint:#a89c86;
+  --red:#ef4e36; --blue:#2c4bc0; --yellow:#f5c033; --tint:#bfcaf0;
+  --serif:"Fraunces",Georgia,serif; --mono:"IBM Plex Mono",ui-monospace,monospace; --hand:"Caveat",cursive;
+  --line:2px solid var(--ink); --shadow:5px 5px 0 var(--ink); --shadow-sm:3px 3px 0 var(--ink);
+  --max:1120px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:18px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+img,video{max-width:100%;display:block}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+.mono{font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase}
+.mute{color:var(--mute)}
+.hand{font-family:var(--hand);font-size:26px;color:var(--red);line-height:1}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-weight:600;font-size:14px;letter-spacing:.06em;text-transform:uppercase;
+  text-decoration:none;white-space:nowrap;padding:14px 22px;border:var(--line);border-radius:999px;background:var(--card);box-shadow:var(--shadow-sm);transition:transform .12s,box-shadow .12s}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink)}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.btn-red{background:var(--red);color:#fff}
+.btn:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+
+/* ---------- nav ---------- */
+nav{position:sticky;top:0;z-index:20;background:rgba(243,236,223,.92);backdrop-filter:blur(6px);border-bottom:var(--line)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
+.logo{font-weight:800;font-size:24px;letter-spacing:-.02em;text-decoration:none;white-space:nowrap}
+.logo b{color:var(--red)}
+nav ul{display:flex;gap:28px;list-style:none}
+nav ul a{font-family:var(--mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none}
+nav ul a:hover{color:var(--red)}
+nav .btn{padding:9px 16px;font-size:12px}
+
+/* ---------- hero ---------- */
+.hero{padding:72px 0 88px;position:relative}
+.hero-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:56px;align-items:center}
+.eyebrow{display:inline-block;border:var(--line);background:var(--yellow);padding:5px 12px;box-shadow:var(--shadow-sm);margin-bottom:28px}
+h1{font-size:clamp(38px,5.2vw,64px);line-height:1.02;letter-spacing:-.03em;font-weight:800}
+h1 .strike{position:relative;white-space:nowrap}
+h1 .strike svg{position:absolute;left:-4%;bottom:-10px;width:108%;height:18px;overflow:visible}
+.lead{font-size:21px;margin:28px 0 34px;max-width:33ch}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.stack{margin-top:34px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:12px;border:1.5px solid var(--ink);border-radius:999px;padding:4px 10px;background:var(--soft)}
+.player{position:relative;border:var(--line);background:var(--card);box-shadow:8px 8px 0 var(--ink);transform:rotate(.6deg)}
+.player-bar{display:flex;align-items:center;gap:7px;padding:8px 12px;border-bottom:var(--line);background:var(--soft)}
+.player-bar i{width:11px;height:11px;border-radius:50%;border:1.5px solid var(--ink)}
+.player-bar i:first-child{background:var(--red)}
+.player-bar span{margin-left:auto;font-size:11px}
+.poster{display:block;width:100%;border:0;padding:0;background:var(--paper);cursor:pointer}
+.poster img{width:100%;aspect-ratio:16/9;object-fit:cover}
+.poster:hover img{filter:brightness(1.03)}
+/* video lightbox */
+.modal{position:fixed;inset:0;z-index:50;background:rgba(28,26,24,.86);display:flex;align-items:center;justify-content:center;padding:24px}
+.modal[hidden]{display:none}
+.modal-box{position:relative;width:min(1100px,100%,calc((100vh - 140px) * 16 / 9));border:var(--line);border-color:var(--paper);background:var(--card);box-shadow:8px 8px 0 var(--red)}
+.modal-box video{width:100%;aspect-ratio:16/9;background:#000}
+.modal-close{position:absolute;top:-52px;right:-2px;width:42px;height:42px;border-radius:50%;border:2px solid var(--paper);background:var(--red);color:#fff;font-family:var(--mono);font-size:22px;line-height:1;cursor:pointer}
+.player-note{margin:22px 0 0 auto;width:max-content;transform:rotate(-3deg)}
+
+/* ---------- sections ---------- */
+section{padding:96px 0;border-top:var(--line)}
+.sec-head{display:grid;grid-template-columns:120px 1fr;gap:24px;margin-bottom:48px;align-items:start}
+.sec-num{font-family:var(--mono);font-size:14px;border:var(--line);background:var(--card);box-shadow:var(--shadow-sm);width:max-content;padding:6px 12px}
+h2{font-size:clamp(30px,3.8vw,46px);line-height:1.08;letter-spacing:-.025em;font-weight:800;max-width:22ch}
+.sec-head p{margin-top:16px;max-width:60ch;color:var(--mute);font-size:19px}
+
+/* problem: two columns, form-fill vs qualified */
+.versus{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.card{background:var(--card);border:var(--line);box-shadow:var(--shadow);padding:28px}
+.card h3{font-size:24px;letter-spacing:-.01em;margin:10px 0 12px}
+.card p{color:var(--ink)}
+.card.bad .mono{color:var(--red)}
+.card.good .mono{color:var(--blue)}
+.crowd{display:grid;grid-template-columns:repeat(14,1fr);gap:6px 4px;margin:18px 0 8px}
+.pp{width:100%;aspect-ratio:24/30;fill:var(--soft);stroke:var(--ink);stroke-width:1.5}
+.pp.f{fill:var(--tint)}
+.pp.q{fill:var(--yellow)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;color:var(--mute)}
+.legend .pp{width:12px;height:15px;margin-right:6px;vertical-align:-3px}
+
+/* calculator receipt */
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+.inputs{display:grid;gap:26px}
+.field label{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:10px}
+.field label b{font-family:var(--mono);font-size:20px;font-weight:600}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:10px;background:var(--card);border:var(--line);border-radius:999px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--red);border:var(--line);box-shadow:2px 2px 0 var(--ink);cursor:grab}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--red);border:var(--line);cursor:grab}
+.receipt{background:var(--card);border:var(--line);box-shadow:var(--shadow);padding:30px 30px 26px;font-family:var(--mono);font-size:15px;position:relative;transform:rotate(-.8deg)}
+.receipt::after{content:"";position:absolute;left:-2px;right:-2px;bottom:-14px;height:14px;
+  background:linear-gradient(-45deg,transparent 7px,var(--card) 0) 0 0/14px 14px repeat-x,linear-gradient(45deg,transparent 7px,var(--card) 0) 0 0/14px 14px repeat-x}
+.receipt h4{font-size:13px;letter-spacing:.14em;text-align:center;margin-bottom:18px}
+.spend{display:flex;justify-content:space-between;padding-bottom:14px;margin-bottom:6px;border-bottom:1.5px dashed var(--faint)}
+.stage{padding:12px 0;border-bottom:1.5px dashed var(--faint)}
+.st-top{display:flex;justify-content:space-between;gap:10px}
+.st-top b{font-weight:600}
+.bar{height:14px;border:1.5px solid var(--ink);background:var(--soft);margin:7px 0 6px}
+.bar i{display:block;height:100%;transition:width .25s}
+.st-cost{display:flex;justify-content:space-between;color:var(--mute);font-size:13px}
+.st-cost b{color:var(--ink);font-weight:600}
+.cpa{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-top:16px}
+.cpa span:last-child{font-family:var(--serif);font-weight:800;font-size:44px;color:var(--red);letter-spacing:-.02em;line-height:1}
+.receipt small{display:block;margin-top:14px;color:var(--mute);font-size:12px;line-height:1.5}
+
+/* loop / how it works */
+.loop{position:relative}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:22px;list-style:none;position:relative;z-index:2}
+.step{background:var(--card);border:var(--line);box-shadow:var(--shadow);padding:20px 18px 22px;position:relative}
+.step .n{font-family:var(--mono);font-size:12px;color:var(--mute)}
+.ic{display:block;width:88px;height:66px;margin:10px 0 4px;fill:none;stroke:var(--ink);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;overflow:visible}
+.step h3{font-size:20px;line-height:1.15;margin:8px 0 10px;letter-spacing:-.01em}
+.step p{font-size:15px;line-height:1.5}
+.step code{font-family:var(--mono);font-size:12.5px;background:var(--soft);border:1px solid var(--shade);padding:0 4px}
+.step:not(:last-child)::after{content:"";position:absolute;right:-21px;top:44px;width:20px;height:2px;background:var(--ink)}
+.step.hot{background:var(--yellow)}
+.return{display:block;width:100%;height:120px;margin-top:-6px;overflow:visible}
+.return-path{fill:none;stroke:var(--red);stroke-width:3;stroke-linecap:round;stroke-dasharray:1200;stroke-dashoffset:1200;transition:stroke-dashoffset 2.2s cubic-bezier(.6,0,.2,1)}
+.loop.on .return-path{stroke-dashoffset:0}
+.plane{opacity:0;transition:opacity .3s 1.8s}
+.loop.on .plane{opacity:1}
+.return-label{font-family:var(--mono);font-size:13px;letter-spacing:.1em;fill:var(--ink)}
+.callout{margin:28px auto 0;max-width:720px;text-align:center;font-size:22px}
+.callout em{background:linear-gradient(transparent 58%,var(--yellow) 0)}
+
+/* trade */
+.trade{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.metric{background:var(--card);border:var(--line);box-shadow:var(--shadow);padding:26px;text-align:center}
+.metric .arrow{font-family:var(--mono);font-size:56px;line-height:1;font-weight:600}
+.metric.up .arrow{color:var(--red)}
+.metric.down .arrow{color:var(--blue)}
+.metric h3{font-size:22px;margin:6px 0 8px}
+.metric p{font-size:15px;color:var(--mute)}
+.honest{margin-top:34px;border-left:4px solid var(--ink);padding:6px 0 6px 20px;max-width:70ch}
+
+/* proof table */
+.proof{width:100%;border-collapse:collapse;background:var(--card);border:var(--line);box-shadow:var(--shadow)}
+.proof th,.proof td{text-align:left;padding:16px 18px;border-bottom:1.5px solid var(--shade);vertical-align:top;font-size:16px}
+.proof th{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;background:var(--soft);border-bottom:var(--line)}
+.proof td.res{font-family:var(--mono);font-weight:600;white-space:nowrap}
+.pass{display:inline-block;background:var(--yellow);border:1.5px solid var(--ink);padding:1px 8px;margin-right:6px}
+.proof a{font-family:var(--mono);font-size:13px}
+.limit{margin-top:26px;max-width:70ch;border-left:4px solid var(--ink);padding:4px 0 4px 18px}
+
+/* pilot */
+.pilot{display:grid;grid-template-columns:1.2fr 1fr;gap:28px;align-items:stretch}
+.ticket{background:var(--card);border:var(--line);box-shadow:8px 8px 0 var(--ink);padding:34px;position:relative}
+.ticket .stamp{position:absolute;top:22px;right:22px;transform:rotate(8deg);border:3px solid var(--red);color:var(--red);font-family:var(--mono);font-weight:600;font-size:13px;letter-spacing:.14em;padding:6px 10px}
+.ticket h3{font-size:30px;letter-spacing:-.02em;margin:10px 0 18px;max-width:16ch}
+.ticket ol{list-style:none;counter-reset:i;display:grid;gap:14px}
+.ticket li{counter-increment:i;display:grid;grid-template-columns:34px 1fr;gap:10px}
+.ticket li::before{content:counter(i,decimal-leading-zero);font-family:var(--mono);font-size:13px;padding-top:4px;color:var(--mute)}
+.side{display:grid;gap:22px}
+.side .card{box-shadow:var(--shadow-sm);padding:22px}
+.side h4{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+.side .done h4{color:var(--blue)}
+.side .no h4{color:var(--red)}
+
+/* faq */
+.faq{display:grid;gap:14px;max-width:860px}
+details{background:var(--card);border:var(--line);box-shadow:var(--shadow-sm)}
+summary{list-style:none;cursor:pointer;padding:18px 22px;font-weight:600;font-size:20px;display:flex;justify-content:space-between;gap:16px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-family:var(--mono);font-size:24px;line-height:1;transition:transform .2s}
+details[open] summary::after{transform:rotate(45deg)}
+details p{padding:0 22px 20px;max-width:70ch}
+
+/* about + final */
+.about{display:grid;grid-template-columns:1fr 1.3fr;gap:48px;align-items:center}
+.facts{list-style:none;display:grid;gap:12px}
+.facts li{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:baseline;border-bottom:1.5px dashed var(--faint);padding-bottom:12px}
+.facts b{font-family:var(--mono);font-size:13px;color:var(--mute);min-width:84px}
+.final{background:var(--ink);color:var(--paper);text-align:center;border-top:none}
+.final h2{margin:0 auto;max-width:20ch;color:var(--paper)}
+.final p{margin:20px auto 34px;max-width:52ch;color:#d8cfbd;font-size:20px}
+.final .btn{box-shadow:4px 4px 0 var(--ink);border-color:var(--ink)}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;text-align:left}
+.final .contact-copy h2{margin:8px 0 0;max-width:16ch}
+.final .contact-copy p{margin:20px 0 28px;max-width:40ch}
+.two-steps{list-style:none;display:grid;gap:12px;color:#d8cfbd}
+.two-steps li{display:flex;align-items:center;gap:12px}
+.two-steps b{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--yellow);color:var(--ink)}
+.form-card{background:var(--card);color:var(--ink);border:var(--line);border-color:var(--paper);box-shadow:8px 8px 0 var(--red);padding:30px}
+.step-tag{display:block;margin-bottom:16px;font-size:12px}
+.f{margin-bottom:16px}
+.f label{display:block;font-size:16px;margin-bottom:6px;font-weight:600}
+.f label .mute{font-weight:400}
+.f input{width:100%;font:inherit;font-size:17px;padding:12px 14px;border:var(--line);background:#fff;border-radius:0;box-shadow:inset 2px 2px 0 var(--shade)}
+.f input:focus{outline:3px solid var(--blue);outline-offset:1px}
+.f input[aria-invalid=true]{border-color:var(--red);background:#fff5f2}
+.form-err{color:var(--red);font-family:var(--mono);font-size:13px;min-height:18px;margin:-4px 0 10px}
+.form-card .btn{width:100%;justify-content:center}
+.privacy{display:block;margin-top:14px;font-family:var(--mono);font-size:11.5px;line-height:1.5;color:var(--mute)}
+#bookStep h3{font-size:24px;margin-bottom:16px}
+#bookSlot iframe{width:100%;height:620px;border:var(--line);background:#fff}
+.guarantee-line{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-top:22px}
+.seal{display:inline-block;transform:rotate(-2deg);border:3px solid var(--red);color:var(--red);font-family:var(--mono);font-weight:600;font-size:13px;letter-spacing:.1em;text-transform:uppercase;padding:6px 12px;background:var(--card)}
+.side .guarantee{border-color:var(--red);box-shadow:5px 5px 0 var(--red)}
+.side .guarantee h4{color:var(--red)}
+.g-big{font-size:26px;font-weight:800;letter-spacing:-.01em;line-height:1.15;margin-bottom:10px}
+.final .sibling{margin:56px auto 0;max-width:none;text-align:center;font-family:var(--mono);font-size:13px;color:#d8cfbd}
+.sibling a{color:var(--yellow)}
+footer{padding:28px 0 40px;font-family:var(--mono);font-size:12px;color:var(--mute);border-top:var(--line)}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(16px);transition:opacity .6s,transform .6s}
+.rv.on{opacity:1;transform:none}
+
+/* ---------- responsive ---------- */
+@media (max-width:980px){
+  nav ul{display:none}
+  .hero-grid,.calc,.pilot,.about,.contact-grid{grid-template-columns:1fr}
+  .player-note{display:none}
+  .steps{grid-template-columns:1fr;gap:18px;padding-left:44px}
+  .step:not(:last-child)::after{right:auto;left:40px;top:auto;bottom:-19px;width:2px;height:18px}
+  .return{display:none}
+  .steps::before{content:"";position:absolute;left:14px;top:30px;bottom:30px;width:3px;background:var(--red);border-radius:2px}
+  .steps::after{content:"signal back";position:absolute;left:-6px;top:50%;transform:rotate(-90deg) translateX(-50%);transform-origin:left top;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;background:var(--paper);padding:0 6px;color:var(--red)}
+  .trade{grid-template-columns:1fr}
+  .versus{grid-template-columns:1fr}
+  .sec-head{grid-template-columns:1fr;gap:16px}
+}
+@media (max-width:640px){
+  body{font-size:17px}
+  section{padding:68px 0}
+  .hero{padding:44px 0 64px}
+  .lead{font-size:19px}
+  .proof thead{display:none}
+  .proof,.proof tbody,.proof tr,.proof td{display:block;width:100%}
+  .proof tr{border-bottom:var(--line);padding:6px 0}
+  .proof td{border:none;padding:6px 16px}
+  .proof td.res{white-space:normal}
+  .ticket{padding:26px 22px}
+  .form-card{padding:22px}
+  .ticket .stamp{position:static;display:inline-block;margin-bottom:8px}
+  .crowd{grid-template-columns:repeat(10,1fr)}
+  nav .btn{padding:8px 12px;font-size:11px}
+  .logo{font-size:20px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .rv{opacity:1;transform:none;transition:none}
+  .return-path{stroke-dashoffset:0;transition:none}
+  .plane{opacity:1;transition:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="logo" href="#top">lead<b>-</b>signal engine</a>
+    <ul>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#proof">Proof</a></li>
+      <li><a href="#pilot">Pilot</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <a class="btn btn-red" href="#contact">Book a call</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow mono">For businesses that live on paid leads</span>
+      <h1>You'll pay more per lead. And you'll <span class="strike">thank me<svg viewBox="0 0 200 18" preserveAspectRatio="none" aria-hidden="true"><path d="M3 12 C 50 3, 110 17, 197 6" fill="none" stroke="#ef4e36" stroke-width="5" stroke-linecap="round"/></svg></span> for it.</h1>
+      <p class="lead">I send your qualified leads back to Meta and Google Ads. The campaign stops learning who fills forms and starts learning who becomes a real qualified lead. Fewer cheap form fills, more leads your sales team wants to call.</p>
+      <div class="cta-row">
+        <a class="btn btn-red" href="#contact">Book a 15-min call</a>
+        <a class="btn" href="#demo" data-open>&#9654; Watch the 73s demo</a>
+      </div>
+      <p class="guarantee-line"><span class="seal">It works or you don't pay</span><span class="mono mute">Live in 3 business days after access</span></p>
+      <div class="stack">
+        <span class="chip">Any form</span><span class="chip">Meta Lead Ads</span><span class="chip">Google lead forms</span><span class="chip">HubSpot or any CRM</span><span class="chip">Meta CAPI</span><span class="chip">Google Ads</span>
+      </div>
+    </div>
+    <div id="demo">
+      <div class="player">
+        <div class="player-bar"><i></i><i></i><i></i><span class="mono mute">demo · 73s · no voice</span></div>
+        <button class="poster" data-open aria-label="Play the 73-second demo"><img src="media/poster.jpg" alt="Lead Signal Engine demo: campaign, people, form, engine, CRM, and the signal back to the ad"></button>
+      </div>
+      <p class="hand player-note">fictional data, real system &#8599;</p>
+    </div>
+  </div>
+</header>
+
+<section id="problem">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="sec-num">01</span>
+      <div>
+        <h2>Your campaign only knows who filled the form.</h2>
+        <p>Meta and Google don't know if that person picked up the phone, booked a call or bought. So they keep finding more people who fill forms. Cheap leads that sales never closes.</p>
+      </div>
+    </div>
+    <div class="versus">
+      <div class="card bad rv">
+        <span class="mono">Today · the platform learns</span>
+        <h3>"Find more people who fill forms."</h3>
+        <div class="crowd" id="crowdA" aria-hidden="true"></div>
+        <div class="legend"><span><svg class="pp f"><use href="#person"/></svg>filled the form</span><span><svg class="pp q"><use href="#person"/></svg>qualified</span></div>
+        <p style="margin-top:14px">Every form fill counts the same. The good leads wait hours in a spreadsheet before anybody calls.</p>
+      </div>
+      <div class="card good rv">
+        <span class="mono">With the signal back · it learns</span>
+        <h3>"Find more people like the ones who qualified."</h3>
+        <div class="crowd" id="crowdB" aria-hidden="true"></div>
+        <div class="legend"><span><svg class="pp f"><use href="#person"/></svg>filled the form</span><span><svg class="pp q"><use href="#person"/></svg>qualified</span></div>
+        <p style="margin-top:14px">The qualified lead goes back as a conversion. The algorithm gets a better target and sales gets the lead in seconds.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="cost">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="sec-num">02</span>
+      <div>
+        <h2>See what each step of your funnel costs.</h2>
+        <p>Move the sliders to your account. It's simple math, nothing is sent anywhere.</p>
+      </div>
+    </div>
+    <div class="calc">
+      <div class="inputs rv">
+        <div class="field">
+          <label for="leads"><span>Leads per month</span><b id="leadsV">300</b></label>
+          <input type="range" id="leads" min="50" max="3000" step="50" value="300">
+        </div>
+        <div class="field">
+          <label for="cpl"><span>Cost per lead (CPL)</span><b id="cplV">$40</b></label>
+          <input type="range" id="cpl" min="5" max="300" step="1" value="40">
+        </div>
+        <div class="field">
+          <label for="qual"><span>Leads that become qualified</span><b id="qualV">20%</b></label>
+          <input type="range" id="qual" min="2" max="80" step="1" value="20">
+        </div>
+        <div class="field">
+          <label for="book"><span>Qualified leads that book a call or visit</span><b id="bookV">40%</b></label>
+          <input type="range" id="book" min="5" max="100" step="1" value="40">
+        </div>
+        <div class="field">
+          <label for="close"><span>Calls or visits that become a sale</span><b id="closeV">25%</b></label>
+          <input type="range" id="close" min="2" max="100" step="1" value="25">
+        </div>
+      </div>
+      <div class="receipt rv" aria-live="polite">
+        <h4>Your funnel · per month</h4>
+        <div class="spend"><span>Ad spend</span><b id="spend">$12,000</b></div>
+        <div class="stage"><div class="st-top"><span>Leads</span><b id="n0">300</b></div><div class="bar"><i id="b0" style="background:var(--tint)"></i></div><div class="st-cost"><span>cost per lead</span><b id="c0">$40</b></div></div>
+        <div class="stage"><div class="st-top"><span>Qualified leads</span><b id="n1">60</b></div><div class="bar"><i id="b1" style="background:var(--yellow)"></i></div><div class="st-cost"><span>cost per qualified lead</span><b id="c1">$200</b></div></div>
+        <div class="stage"><div class="st-top"><span>Calls or visits booked</span><b id="n2">24</b></div><div class="bar"><i id="b2" style="background:var(--blue)"></i></div><div class="st-cost"><span>cost per call or visit</span><b id="c2">$500</b></div></div>
+        <div class="stage"><div class="st-top"><span>Sales</span><b id="n3">6</b></div><div class="bar"><i id="b3" style="background:var(--red)"></i></div><div class="st-cost"><span>&nbsp;</span><span></span></div></div>
+        <div class="cpa"><span>Cost per sale<br>(CPA)</span><span id="cpa">$2,000</span></div>
+        <small>Example numbers, change them to yours. The engine works on the second line: it tells Meta and Google which leads got qualified, so they bring more of them. More of those down the funnel is what moves the CPA.</small>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="sec-num">03</span>
+      <div>
+        <h2>Five steps, and the last one goes back to the ad.</h2>
+        <p>It plugs into the landing page, form and CRM you already use. Nothing to rebuild.</p>
+      </div>
+    </div>
+    <div class="loop" id="loop">
+      <ol class="steps">
+        <li class="step rv"><span class="n">01 · capture</span><svg class="ic" viewBox="0 0 76 58" aria-hidden="true"><rect x="18" y="3" width="40" height="52" rx="3" fill="#fbf6ec"/><path d="M24 12h22"/><rect x="24" y="18" width="28" height="8" fill="#fff"/><rect x="24" y="30" width="28" height="8" fill="#fff"/><rect x="24" y="43" width="18" height="7" rx="3.5" fill="#ef4e36"/><path d="M50 40l10 4-4 2 4 5-2 2-5-5-2 4z" fill="#fff"/></svg><h3>Lead comes in</h3><p>Any page form, Meta Lead Ads or Google lead forms. One script line keeps <code>gclid</code>, <code>fbclid</code> and UTMs for 90 days.</p></li>
+        <li class="step rv"><span class="n">02 · clean</span><svg class="ic" viewBox="0 0 76 58" aria-hidden="true"><rect x="4" y="12" width="26" height="34" fill="#bfcaf0"/><rect x="13" y="6" width="26" height="34" fill="#fbf6ec"/><path d="M18 15h14M18 21h10M18 27h14"/><circle cx="51" cy="32" r="12" fill="#f5c033"/><path d="M60 41l11 12" stroke-width="4"/><path d="M46 32l4 4 7-8"/></svg><h3>Dedupe and enrich</h3><p>Same person twice is one record and one message. Company data from the website and AI, or Clay.</p></li>
+        <li class="step rv"><span class="n">03 · score</span><svg class="ic" viewBox="0 0 76 58" aria-hidden="true"><path d="M8 48a30 30 0 0 1 60 0" fill="#fbf6ec"/><path d="M59.2 26.8A30 30 0 0 1 68 48" stroke="#ef4e36" stroke-width="5"/><path d="M14 48h48"/><path d="M38 48l16-16" stroke-width="3"/><circle cx="38" cy="48" r="4" fill="#ef4e36"/><path d="M38 18v5M17 27l4 3M59 27l-4 3"/></svg><h3>AI scores the fit</h3><p>Your rules plus an AI rubric give a score and a confidence level. Call now, nurture, or a person reviews it.</p></li>
+        <li class="step rv"><span class="n">04 · CRM</span><svg class="ic" viewBox="0 0 76 58" aria-hidden="true"><rect x="3" y="4" width="21" height="50" fill="#fbf6ec"/><rect x="27.5" y="4" width="21" height="50" fill="#fbf6ec"/><rect x="52" y="4" width="21" height="50" fill="#fbf6ec"/><rect x="7" y="12" width="13" height="9" fill="#fff"/><rect x="7" y="25" width="13" height="9" fill="#fff"/><rect x="31.5" y="12" width="13" height="9" fill="#fff"/><rect x="56" y="12" width="13" height="11" fill="#f5c033"/><path d="M22 30h30" stroke="#ef4e36" stroke-dasharray="3 3"/></svg><h3>Sales gets it in seconds</h3><p>Lead lands in HubSpot or your CRM with a first reply written in your business's own words.</p></li>
+        <li class="step hot rv"><span class="n">05 · signal</span><svg class="ic" viewBox="0 0 76 58" aria-hidden="true"><path d="M4 52c10-2 16-8 22-16" stroke="#ef4e36" stroke-dasharray="4 4"/><path d="M22 30L72 6 52 50 42 36z" fill="#f5c033"/><path d="M42 36L72 6"/><path d="M42 36l-2 12 8-8" fill="#fbf6ec"/></svg><h3>Qualified goes back</h3><p>Meta gets it through the Conversions API, Google Ads through the Data Manager API. Same <code>event_id</code>, nothing counts twice.</p></li>
+      </ol>
+      <svg class="return" viewBox="0 0 1072 120" preserveAspectRatio="none" aria-hidden="true">
+        <path class="return-path" d="M965 4 C 965 90, 900 104, 800 104 L 270 104 C 170 104, 107 90, 107 10"/>
+        <path class="plane" d="M100 2 l14 22 l-14 -6 l-14 6 z" fill="#f5c033" stroke="#1c1a18" stroke-width="2" stroke-linejoin="round"/>
+        <text class="return-label" x="536" y="94" text-anchor="middle">QUALIFIED-LEAD EVENT &#8594; META · GOOGLE &#8594; NEXT CAMPAIGN</text>
+      </svg>
+      <p class="callout rv">Step 5 is what changes the campaign. <em>The algorithm starts learning who becomes a qualified lead, not just who fills a form.</em></p>
+    </div>
+  </div>
+</section>
+
+<section id="trade">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="sec-num">04</span>
+      <div>
+        <h2>The trade you want to make.</h2>
+        <p>When the platform stops chasing the cheapest form fills, one number gets worse and the two that pay the bills get better.</p>
+      </div>
+    </div>
+    <div class="trade">
+      <div class="metric up rv"><div class="arrow">&#8593;</div><h3>CPL</h3><p>Can go up. The platform stops buying the cheapest form fills.</p></div>
+      <div class="metric down rv"><div class="arrow">&#8595;</div><h3>Cost per qualified lead</h3><p>Goes down. More of what you pay for is a lead sales wants.</p></div>
+      <div class="metric down rv"><div class="arrow">&#8595;</div><h3>CPA</h3><p>Goes down. That is the number your business lives on.</p></div>
+    </div>
+    <p class="honest rv">This is what happened when I built the first version at a high-ticket performance agency in Brazil, running paid lead gen for B2B clients. I don't promise you a number. It depends on offer, creative and budget too. What I promise is the signal working, checked with you on the platform's own screen.</p>
+  </div>
+</section>
+
+<section id="proof">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="sec-num">05</span>
+      <div>
+        <h2>Proof that it runs, not slides.</h2>
+        <p>Every check below is written down in the public repo, step by step.</p>
+      </div>
+    </div>
+    <table class="proof rv">
+      <thead><tr><th>What I tested</th><th>Result</th><th>Report</th></tr></thead>
+      <tbody>
+        <tr><td>Full scenario offline, 9 leads, every step checked</td><td class="res"><span class="pass">PASS</span>every step</td><td><a href="https://github.com/Ramon-nassa/lead-signal-engine-demo/blob/main/proof/TRACE.md">TRACE.md</a></td></tr>
+        <tr><td>Same run on real accounts: HubSpot CRM and Meta Conversions API in test mode. Events show as Processed in Meta Events Manager</td><td class="res"><span class="pass">PASS</span>Processed</td><td><a href="https://github.com/Ramon-nassa/lead-signal-engine-demo/blob/main/proof/TRACE-live-accounts.md">TRACE-live-accounts.md</a></td></tr>
+        <tr><td>Clay on a real workspace: webhook in, enrich company, read back</td><td class="res"><span class="pass">PASS</span>enriched</td><td><a href="https://github.com/Ramon-nassa/lead-signal-engine-demo/blob/main/proof/CLAY-CHECK.md">CLAY-CHECK.md</a></td></tr>
+        <tr><td>Capture script in a real browser: click ids reach the engine and your form still submits</td><td class="res"><span class="pass">PASS</span>gclid + gbraid</td><td><a href="https://github.com/Ramon-nassa/lead-signal-engine-demo/blob/main/proof/BROWSER-CHECK.md">BROWSER-CHECK.md</a></td></tr>
+        <tr><td>Automated tests: unit, adapters with mocked HTTP, end to end through the API</td><td class="res"><span class="pass">PASS</span>unit + end to end</td><td class="mute">walkthrough on a call</td></tr>
+      </tbody>
+    </table>
+    <p class="limit rv">The demo data is fictional. It proves the flow and what happens when an API fails. It doesn't prove a client result yet.</p>
+  </div>
+</section>
+
+<section id="pilot">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="sec-num">06</span>
+      <div>
+        <h2>Live in 3 business days. It works or you don't pay.</h2>
+        <p>The engine is already built. I connect it to your stack, so you are not paying for something made from zero. The 3 days start when I have access to your ad accounts, CRM and form.</p>
+      </div>
+    </div>
+    <div class="pilot">
+      <div class="ticket rv">
+        <span class="stamp">FIXED PRICE</span>
+        <span class="mono mute">The pilot includes</span>
+        <h3>One lead source, wired end to end.</h3>
+        <ol>
+          <li><span>Your form or your Meta / Google lead form connected, with click ids kept.</span></li>
+          <li><span>Scoring rules written with your sales team, in their words.</span></li>
+          <li><span>Leads in your CRM in seconds, with the first reply.</span></li>
+          <li><span>The qualified-lead signal live on Meta and Google Ads.</span></li>
+          <li><span>A short handover: what runs, where to look, what to do if something breaks.</span></li>
+        </ol>
+      </div>
+      <div class="side">
+        <div class="card guarantee rv"><h4>The guarantee</h4><p class="g-big">It works or you don't pay.</p><p>"Works" means a test lead goes through every step and the qualified-lead event shows up in your Meta Events Manager and in Google Ads. We check it together on a call. If it doesn't show up, you don't pay for the service.</p></div>
+        <div class="card rv"><h4>Price</h4><p>Fixed, agreed before we start, for the scope above. No hourly meter.</p></div>
+        <div class="card no rv"><h4>What I don't promise</h4><p>A CPL or CPA number. I promise the signal working, and the before and after on the platform's own screen.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="sec-num">07</span>
+      <div><h2>What people ask before the call.</h2></div>
+    </div>
+    <div class="faq">
+      <details class="rv"><summary>Will my CPL go up?</summary><p>It can, and that's ok. The platform stops buying the cheapest form fills. Watch the cost per qualified lead and the CPA instead. Those are the ones that should go down.</p></details>
+      <details class="rv"><summary>How long does it take?</summary><p>3 business days after you give access to your ad accounts, CRM and form. Most of that access takes a few minutes on your side, and I send you a step by step.</p></details>
+      <details class="rv"><summary>Do I need to rebuild my landing page or change my CRM?</summary><p>No. On the page it's one script line, and your form keeps working like before. HubSpot is built in. Other CRMs connect through their own API.</p></details>
+      <details class="rv"><summary>What happens with my customers' data?</summary><p>Contact data only leaves the engine hashed with SHA-256. A signal is sent only for a qualified lead who gave ad consent.</p></details>
+      <details class="rv"><summary>What if Meta or Google is down?</summary><p>The send is retried and goes out once. If the outage is longer than the retry window, the lead is parked and resumed later, without repeating the steps that already worked.</p></details>
+      <details class="rv"><summary>Is AI going to change my ads or my budget?</summary><p>No. The AI scores the lead and writes the first reply. It doesn't touch your campaigns or your budget. And when it isn't sure about a lead, it doesn't guess. The lead goes to a person to review.</p></details>
+      <details class="rv"><summary>Can I see the code?</summary><p>The proof is public on GitHub. The code repo is private for now, and I walk through it and run it live on a call.</p></details>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap about">
+    <div class="rv">
+      <span class="sec-num">08</span>
+      <h2 style="margin-top:24px">Built by someone who paid for the leads.</h2>
+    </div>
+    <div class="rv">
+      <p style="font-size:20px;margin-bottom:24px">I'm Ramon, a growth lead who builds. For 4 years I ran Meta and Google Ads for lead gen and e-commerce, and I answered for the number. Today I turn that repeated work into AI systems that run every day.</p>
+      <ul class="facts">
+        <li><b>Agency</b><span>Paid media for 50+ clients at a high-ticket performance agency in Brazil. The first version of this engine was built there.</span></li>
+        <li><b>Ad spend</b><span>About $1M per year in ad spend at a US DTC brand.</span></li>
+        <li><b>Head role</b><span>Promoted to a Head role twice, in under 6 months.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="final" id="contact">
+  <div class="wrap contact-grid">
+    <div class="contact-copy">
+      <span class="hand" style="color:var(--yellow)">15 minutes, your numbers</span>
+      <h2>Show me your lead flow. I'll tell you where the signal breaks.</h2>
+      <p>Leave your details and pick a time. On the call I show you what I would check first in your account.</p>
+      <ol class="two-steps mono"><li><b>1</b>Your details</li><li><b>2</b>Pick a time for the call</li></ol>
+    </div>
+    <div class="form-card">
+      <form id="leadForm" novalidate>
+        <span class="mono mute step-tag">Step 1 of 2 · about you</span>
+        <div class="f"><label for="f-name">Name</label><input id="f-name" name="name" autocomplete="name" required></div>
+        <div class="f"><label for="f-email">Work email</label><input id="f-email" name="email" type="email" autocomplete="email" required></div>
+        <div class="f"><label for="f-company">Company</label><input id="f-company" name="company" autocomplete="organization" required></div>
+        <div class="f"><label for="f-phone">Phone <span class="mute">(WhatsApp is fine)</span></label><input id="f-phone" name="phone" type="tel" autocomplete="tel"></div>
+        <p class="form-err" id="formErr" role="alert"></p>
+        <button class="btn btn-red" type="submit">Next: pick a time &#8594;</button>
+        <small class="privacy">What you type is saved as you go, so I can reach you even if the page closes. I only use it to reply to you.</small>
+      </form>
+      <div id="bookStep" hidden>
+        <span class="mono mute step-tag">Step 2 of 2 · pick a time</span>
+        <h3 id="bookTitle">Thanks. Now pick a time for the call.</h3>
+        <div id="bookSlot"></div>
+      </div>
+    </div>
+  </div>
+  <div class="wrap"><p class="sibling">Selling online instead of collecting leads? See <a href="https://github.com/Ramon-nassa/sale-signal-fix-demo">Sale Signal Fix</a>: every sale reaches Meta once, with the buyer attached.</p></div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Ramon Nassaralla · Growth lead who builds</span>
+    <span>All people, companies and data in the demo are fictional.</span>
+  </div>
+</footer>
+
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-label="Lead Signal Engine demo">
+  <div class="modal-box">
+    <button class="modal-close" id="modalClose" aria-label="Close video">&#215;</button>
+    <video id="vid" controls playsinline preload="none" poster="media/poster.jpg">
+      <source src="media/lead-signal-engine.mp4" type="video/mp4">
+    </video>
+  </div>
+</div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="person" viewBox="0 0 24 30"><circle cx="12" cy="8" r="5.4"/><path d="M2.5 29.2v-5c0-5.6 4.3-9.6 9.5-9.6s9.5 4 9.5 9.6v5z"/></symbol></svg>
+
+<script>
+// crowds: 70 people each; A = many form fills, few qualified spread randomly; B = fewer fills, more qualified
+function crowd(el, fills, quals, seed){
+  let s = seed; const rnd = () => (s = (s * 9301 + 49297) % 233280) / 233280;
+  const n = 70, cells = Array.from({length:n}, () => "");
+  const pick = (k, cls) => { let c = 0; while (c < k){ const i = Math.floor(rnd()*n); if(!cells[i]){ cells[i] = cls; c++; } } };
+  pick(quals, "q"); pick(fills - quals, "f");
+  el.innerHTML = cells.map(c => `<svg class="pp ${c}"><use href="#person"/></svg>`).join("");
+}
+crowd(document.getElementById("crowdA"), 34, 3, 7);
+crowd(document.getElementById("crowdB"), 22, 9, 3);
+
+// video lightbox
+const modal = document.getElementById("modal"), v = document.getElementById("vid");
+function openVideo(e){ e.preventDefault(); modal.hidden = false; document.body.style.overflow = "hidden"; document.getElementById("modalClose").focus(); v.play().catch(() => {}); }
+function closeVideo(){ v.pause(); modal.hidden = true; document.body.style.overflow = ""; }
+document.querySelectorAll("[data-open]").forEach(el => el.addEventListener("click", openVideo));
+document.getElementById("modalClose").addEventListener("click", closeVideo);
+modal.addEventListener("click", e => { if (e.target === modal) closeVideo(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !modal.hidden) closeVideo(); });
+
+// ---------- lead form: 2 steps, saves every field as it is typed ----------
+// Fill these two after setup (see form-backend/SETUP.md). Empty = form still works, nothing is sent.
+const LEAD_ENDPOINT = "";   // Google Apps Script web app URL (ends in /exec)
+const BOOKING_URL = "";     // booking page, e.g. https://cal.com/<you>/15min
+
+(function(){
+  const KEY = "lse_lead", CLICK = "lse_click", DAY = 864e5;
+  const form = document.getElementById("leadForm");
+  const fields = ["name","email","company","phone"];
+  const store = JSON.parse(localStorage.getItem(KEY) || "{}");
+  if (!store.sid) store.sid = (crypto.randomUUID ? crypto.randomUUID() : Date.now() + "-" + Math.random().toString(36).slice(2));
+  // keep click ids and UTMs for 90 days, like the engine's capture script
+  const qs = new URLSearchParams(location.search), keys = ["gclid","gbraid","wbraid","fbclid","utm_source","utm_medium","utm_campaign","utm_content","utm_term"];
+  let click = JSON.parse(localStorage.getItem(CLICK) || "{}");
+  if (click.t && Date.now() - click.t > 90 * DAY) click = {};
+  keys.forEach(k => { if (qs.get(k)) { click[k] = qs.get(k); click.t = Date.now(); } });
+  localStorage.setItem(CLICK, JSON.stringify(click));
+  fields.forEach(f => { if (store[f]) form.elements[f].value = store[f]; });
+
+  let lastSent = "", timer = null;
+  function payload(stage){
+    const d = { sid: store.sid, stage, page: location.href.split("#")[0], referrer: document.referrer, ts: new Date().toISOString() };
+    fields.forEach(f => d[f] = form.elements[f].value.trim());
+    keys.forEach(k => d[k] = click[k] || "");
+    return d;
+  }
+  function send(stage, beacon){
+    const d = payload(stage), body = JSON.stringify(d), sig = stage + JSON.stringify(fields.map(f => d[f]));
+    if (stage === "partial" && (sig === lastSent || !fields.some(f => d[f]))) return;
+    lastSent = sig;
+    fields.forEach(f => store[f] = d[f]);
+    localStorage.setItem(KEY, JSON.stringify(store));
+    if (!LEAD_ENDPOINT) return;
+    if (beacon && navigator.sendBeacon) { navigator.sendBeacon(LEAD_ENDPOINT, new Blob([body], {type:"text/plain;charset=utf-8"})); return; }
+    fetch(LEAD_ENDPOINT, { method:"POST", mode:"no-cors", keepalive:true, headers:{ "Content-Type":"text/plain;charset=utf-8" }, body }).catch(() => {});
+  }
+  form.addEventListener("input", e => { e.target.removeAttribute("aria-invalid"); clearTimeout(timer); timer = setTimeout(() => send("partial"), 1200); });
+  form.addEventListener("focusout", () => send("partial"));
+  addEventListener("pagehide", () => { if (!store.done) send("partial", true); });
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden" && !store.done) send("partial", true); });
+
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    const err = [], v = n => form.elements[n].value.trim();
+    if (!v("name")) err.push("name");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v("email"))) err.push("email");
+    if (!v("company")) err.push("company");
+    fields.forEach(f => form.elements[f].toggleAttribute("aria-invalid", err.includes(f)));
+    if (err.length) { document.getElementById("formErr").textContent = "Please check: " + err.join(", ") + "."; form.elements[err[0]].focus(); return; }
+    document.getElementById("formErr").textContent = "";
+    send("submitted"); store.done = true; localStorage.setItem(KEY, JSON.stringify(store));
+    const first = v("name").split(" ")[0];
+    form.hidden = true;
+    const step = document.getElementById("bookStep"); step.hidden = false;
+    document.getElementById("bookTitle").textContent = "Thanks, " + first + ". Now pick a time for the call.";
+    const slot = document.getElementById("bookSlot");
+    if (BOOKING_URL) {
+      const u = new URL(BOOKING_URL);
+      u.searchParams.set("name", v("name")); u.searchParams.set("email", v("email")); u.searchParams.set("notes", "Company: " + v("company"));
+      slot.innerHTML = `<iframe src="${u}" title="Pick a time for the call" loading="lazy"></iframe>`;
+    } else {
+      document.getElementById("bookTitle").textContent = "Thanks, " + first + ". I got your details.";
+      slot.innerHTML = "<p>I'll email you to set a time for the call.</p>";
+    }
+    step.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+})();
+
+// calculator
+const $ = id => document.getElementById(id);
+const money = v => "$" + Math.round(v).toLocaleString("en-US");
+const pct = id => +$(id).value / 100;
+function calc(){
+  const L = +$("leads").value, C = +$("cpl").value;
+  const n = [L, L * pct("qual"), 0, 0];
+  n[2] = n[1] * pct("book"); n[3] = n[2] * pct("close");
+  const spend = L * C;
+  $("leadsV").textContent = L.toLocaleString("en-US");
+  $("cplV").textContent = "$" + C;
+  ["qual","book","close"].forEach(id => $(id + "V").textContent = $(id).value + "%");
+  $("spend").textContent = money(spend);
+  n.forEach((x, i) => {
+    $("n" + i).textContent = x >= 10 ? Math.round(x).toLocaleString("en-US") : (Math.round(x * 10) / 10).toString();
+    $("b" + i).style.width = Math.max(2, x / L * 100) + "%";
+    if (i < 3) $("c" + i).textContent = x > 0 ? money(spend / x) : "n/a";
+  });
+  $("cpa").textContent = n[3] > 0 ? money(spend / n[3]) : "n/a";
+}
+["leads","cpl","qual","book","close"].forEach(id => $(id).addEventListener("input", calc));
+calc();
+
+// reveal + loop drawing
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ e.target.classList.add("on"); io.unobserve(e.target); } }), {threshold:.18});
+document.querySelectorAll(".rv, #loop").forEach(el => io.observe(el));
+</script>
+</body>
+</html>
