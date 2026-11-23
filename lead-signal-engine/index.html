@@ -599,7 +599,7 @@ const BOOKING_URL = "";     // booking page, e.g. https://cal.com/<you>/15min
 
   let lastSent = "", timer = null;
   function payload(stage){
-    const d = { sid: store.sid, stage, page: location.href.split("#")[0], referrer: document.referrer, ts: new Date().toISOString() };
+    const d = { sid: store.sid, offer: "lead-signal-engine", stage, page: location.href.split("#")[0], referrer: document.referrer, ts: new Date().toISOString() };
     fields.forEach(f => d[f] = form.elements[f].value.trim());
     keys.forEach(k => d[k] = click[k] || "");
     return d;
