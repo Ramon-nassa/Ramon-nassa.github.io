@@ -182,6 +182,14 @@ summary::after{content:"+";font-family:var(--mono);font-size:24px;line-height:1;
 details[open] summary::after{transform:rotate(45deg)}
 details p{padding:0 22px 20px;max-width:70ch}
 
+/* pains + life after */
+.pains{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:44px}
+.pains.after{grid-template-columns:repeat(3,1fr)}
+.pain{background:var(--card);border:var(--line);box-shadow:var(--shadow-sm);padding:20px 20px 22px}
+.pain .mono{color:var(--red)}
+.pains.after .pain .mono{color:var(--blue)}
+.pain h3{font-size:21px;line-height:1.15;letter-spacing:-.01em;margin:8px 0 10px}
+.pain p{font-size:15px;line-height:1.5;color:var(--mute)}
 /* about + final */
 .about{display:grid;grid-template-columns:1fr 1.3fr;gap:48px;align-items:center}
 .facts{list-style:none;display:grid;gap:12px}
@@ -240,6 +248,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   .steps::before{content:"";position:absolute;left:14px;top:30px;bottom:30px;width:3px;background:var(--red);border-radius:2px}
   .steps::after{content:"signal back";position:absolute;left:-6px;top:50%;transform:rotate(-90deg) translateX(-50%);transform-origin:left top;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;background:var(--paper);padding:0 6px;color:var(--red)}
   .trade{grid-template-columns:1fr}
+  .pains,.pains.after{grid-template-columns:1fr 1fr}
   .versus{grid-template-columns:1fr}
   .sec-head{grid-template-columns:1fr;gap:16px}
 }
@@ -257,6 +266,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   .form-card{padding:22px}
   .ticket .stamp{position:static;display:inline-block;margin-bottom:8px}
   .crowd{grid-template-columns:repeat(10,1fr)}
+  .pains,.pains.after{grid-template-columns:1fr}
   nav .btn{padding:8px 12px;font-size:11px}
   .logo{font-size:20px}
 }
@@ -288,7 +298,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <div>
       <span class="eyebrow mono">For businesses that live on paid leads</span>
       <h1>You'll pay more per lead. And you'll <span class="strike">thank me<svg viewBox="0 0 200 18" preserveAspectRatio="none" aria-hidden="true"><path d="M3 12 C 50 3, 110 17, 197 6" fill="none" stroke="#ef4e36" stroke-width="5" stroke-linecap="round"/></svg></span> for it.</h1>
-      <p class="lead">I send your qualified leads back to Meta and Google Ads. The campaign stops learning who fills forms and starts learning who becomes a real qualified lead. Fewer cheap form fills, more leads your sales team wants to call.</p>
+      <p class="lead">Your sales team spends the day calling people who never meant to buy. And the campaign keeps sending more of them, because to Meta and Google every form fill looks the same. I send back who actually qualified, so your next leads look like your best ones.</p>
       <div class="cta-row">
         <a class="btn btn-red" href="#contact">Book a 15-min call</a>
         <a class="btn" href="#demo" data-open>&#9654; Watch the 73s demo</a>
@@ -313,9 +323,15 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <div class="sec-head rv">
       <span class="sec-num">01</span>
       <div>
-        <h2>Your campaign only knows who filled the form.</h2>
-        <p>Meta and Google don't know if that person picked up the phone, booked a call or bought. So they keep finding more people who fill forms. Cheap leads that sales never closes.</p>
+        <h2>Your sales team is calling people who were never going to buy.</h2>
+        <p>To Meta and Google, every form fill is a win. They don't know who picked up, booked a call or bought. So they keep sending more people who fill forms, and the junk grows with your budget.</p>
       </div>
+    </div>
+    <div class="pains">
+      <div class="pain rv"><span class="mono">01</span><h3>Your reps burn the day on bad leads.</h3><p>They dial and dial to find one who picks up. The good lead waits until tomorrow, and goes cold.</p></div>
+      <div class="pain rv"><span class="mono">02</span><h3>The CPL looks great. Revenue doesn't move.</h3><p>The report says the campaign is winning. The bank account says something else.</p></div>
+      <div class="pain rv"><span class="mono">03</span><h3>You raise budget and get more junk.</h3><p>The algorithm scales what it learned: more people who fill forms, not more people who buy.</p></div>
+      <div class="pain rv"><span class="mono">04</span><h3>Sales blames marketing. Marketing blames sales.</h3><p>Nobody can show which ad brought the leads that closed, so every meeting turns into opinion.</p></div>
     </div>
     <div class="versus">
       <div class="card bad rv">
@@ -341,7 +357,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <div class="sec-head rv">
       <span class="sec-num">02</span>
       <div>
-        <h2>See what each step of your funnel costs.</h2>
+        <h2>See what the junk is costing you.</h2>
         <p>Move the sliders to your account. It's simple math, nothing is sent anywhere.</p>
       </div>
     </div>
@@ -387,7 +403,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <div class="sec-head rv">
       <span class="sec-num">03</span>
       <div>
-        <h2>Five steps, and the last one goes back to the ad.</h2>
+        <h2>Plug it in once. The campaign learns from every lead after that.</h2>
         <p>It plugs into the landing page, form and CRM you already use. Nothing to rebuild.</p>
       </div>
     </div>
@@ -414,9 +430,14 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <div class="sec-head rv">
       <span class="sec-num">04</span>
       <div>
-        <h2>The trade you want to make.</h2>
-        <p>When the platform stops chasing the cheapest form fills, one number gets worse and the two that pay the bills get better.</p>
+        <h2>What your week looks like after.</h2>
+        <p>Your CPL can go up. Everything that pays the bills gets better.</p>
       </div>
+    </div>
+    <div class="pains after">
+      <div class="pain rv"><span class="mono">01</span><h3>Your team calls people who want to talk.</h3><p>Leads reach the CRM in seconds, scored, with the first reply already sent. The good ones get called first.</p></div>
+      <div class="pain rv"><span class="mono">02</span><h3>You know which ads bring deals.</h3><p>Every lead carries the ad it came from into the CRM. The meeting is about numbers, not opinions.</p></div>
+      <div class="pain rv"><span class="mono">03</span><h3>You raise budget without fear.</h3><p>The campaign learned who qualifies. More budget brings more of those, not more junk.</p></div>
     </div>
     <div class="trade">
       <div class="metric up rv"><div class="arrow">&#8593;</div><h3>CPL</h3><p>Can go up. The platform stops buying the cheapest form fills.</p></div>
@@ -521,7 +542,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <div class="contact-copy">
       <span class="hand" style="color:var(--yellow)">15 minutes, your numbers</span>
       <h2>Show me your lead flow. I'll tell you where the signal breaks.</h2>
-      <p>Leave your details and pick a time. On the call I show you what I would check first in your account.</p>
+      <p>Leave your details and pick a time. In 15 minutes I show you what I would check first in your account, and what the bad leads are likely costing you.</p>
       <ol class="two-steps mono"><li><b>1</b>Your details</li><li><b>2</b>Pick a time for the call</li></ol>
     </div>
     <div class="form-card">
