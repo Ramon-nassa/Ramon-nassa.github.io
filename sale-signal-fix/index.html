@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sale Signal Fix · every sale reaches Meta once, with the buyer attached</title>
+<meta name="description" content="A tracking audit and fix for stores and info products that sell with Meta ads. Every sale reaches Meta once, with the buyer attached. It works or you don't pay.">
+<meta property="og:title" content="Sale Signal Fix · every sale reaches Meta once, with the buyer attached">
+<meta property="og:description" content="Meta counts your sales. It just doesn't know who bought. Fix the signal, not the creative.">
+<meta property="og:image" content="media/poster.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400&family=IBM+Plex+Mono:wght@400;500;600&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f3ecdf; --card:#fbf6ec; --soft:#f8f2e6; --shade:#e3d8c2;
+  --ink:#1c1a18; --mute:#6f6656; --faint:#a89c86;
+  --red:#ef4e36; --blue:#2c4bc0; --yellow:#f5c033; --tint:#bfcaf0;
+  --serif:"Fraunces",Georgia,serif; --mono:"IBM Plex Mono",ui-monospace,monospace; --hand:"Caveat",cursive;
+  --line:2px solid var(--ink); --shadow:5px 5px 0 var(--ink); --shadow-sm:3px 3px 0 var(--ink);
+  --max:1120px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:18px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+img,video{max-width:100%;display:block}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+.mono{font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase}
+.mute{color:var(--mute)}
+.hand{font-family:var(--hand);font-size:26px;color:var(--red);line-height:1}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-weight:600;font-size:14px;letter-spacing:.06em;text-transform:uppercase;
+  text-decoration:none;white-space:nowrap;padding:14px 22px;border:var(--line);border-radius:999px;background:var(--card);box-shadow:var(--shadow-sm);transition:transform .12s,box-shadow .12s}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink)}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.btn-red{background:var(--red);color:#fff}
+.btn:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+
+/* ---------- nav ---------- */
+nav{position:sticky;top:0;z-index:20;background:rgba(243,236,223,.92);backdrop-filter:blur(6px);border-bottom:var(--line)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
+.logo{font-weight:800;font-size:24px;letter-spacing:-.02em;text-decoration:none;white-space:nowrap}
+.logo b{color:var(--red)}
+nav ul{display:flex;gap:28px;list-style:none}
+nav ul a{font-family:var(--mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none}
+nav ul a:hover{color:var(--red)}
+nav .btn{padding:9px 16px;font-size:12px}
+
+/* ---------- hero ---------- */
+.hero{padding:72px 0 88px;position:relative}
+.hero-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:56px;align-items:center}
+.eyebrow{display:inline-block;border:var(--line);background:var(--yellow);padding:5px 12px;box-shadow:var(--shadow-sm);margin-bottom:28px}
+h1{font-size:clamp(38px,5.2vw,64px);line-height:1.02;letter-spacing:-.03em;font-weight:800}
+h1 .strike{position:relative;white-space:nowrap}
+h1 .strike svg{position:absolute;left:-4%;bottom:-10px;width:108%;height:18px;overflow:visible}
+.lead{font-size:21px;margin:28px 0 34px;max-width:33ch}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.stack{margin-top:34px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:12px;border:1.5px solid var(--ink);border-radius:999px;padding:4px 10px;background:var(--soft)}
+.player{position:relative;border:var(--line);background:var(--card);box-shadow:8px 8px 0 var(--ink);transform:rotate(.6deg)}
+.player-bar{display:flex;align-items:center;gap:7px;padding:8px 12px;border-bottom:var(--line);background:var(--soft)}
+.player-bar i{width:11px;height:11px;border-radius:50%;border:1.5px solid var(--ink)}
+.player-bar i:first-child{background:var(--red)}
+.player-bar span{margin-left:auto;font-size:11px}
+.poster{display:block;width:100%;border:0;padding:0;background:var(--paper);cursor:pointer}
+.poster img{width:100%;aspect-ratio:16/9;object-fit:cover}
+.poster:hover img{filter:brightness(1.03)}
+/* video lightbox */
+.modal{position:fixed;inset:0;z-index:50;background:rgba(28,26,24,.86);display:flex;align-items:center;justify-content:center;padding:24px}
+.modal[hidden]{display:none}
+.modal-box{position:relative;width:min(1100px,100%,calc((100vh - 140px) * 16 / 9));border:var(--line);border-color:var(--paper);background:var(--card);box-shadow:8px 8px 0 var(--red)}
+.modal-box video{width:100%;aspect-ratio:16/9;background:#000}
+.modal-close{position:absolute;top:-52px;right:-2px;width:42px;height:42px;border-radius:50%;border:2px solid var(--paper);background:var(--red);color:#fff;font-family:var(--mono);font-size:22px;line-height:1;cursor:pointer}
+.player-note{margin:22px 0 0 auto;width:max-content;transform:rotate(-3deg)}
+
+/* ---------- sections ---------- */
+section{padding:96px 0;border-top:var(--line)}
+.sec-head{display:grid;grid-template-columns:120px 1fr;gap:24px;margin-bottom:48px;align-items:start}
+.sec-num{font-family:var(--mono);font-size:14px;border:var(--line);background:var(--card);box-shadow:var(--shadow-sm);width:max-content;padding:6px 12px}
+h2{font-size:clamp(30px,3.8vw,46px);line-height:1.08;letter-spacing:-.025em;font-weight:800;max-width:22ch}
+.sec-head p{margin-top:16px;max-width:60ch;color:var(--mute);font-size:19px}
+
+/* problem: two columns, form-fill vs qualified */
+.versus{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.card{background:var(--card);border:var(--line);box-shadow:var(--shadow);padding:28px}
+.card h3{font-size:24px;letter-spacing:-.01em;margin:10px 0 12px}
+.card p{color:var(--ink)}
+.card.bad .mono{color:var(--red)}
+.card.good .mono{color:var(--blue)}
+.crowd{display:grid;grid-template-columns:repeat(14,1fr);gap:6px 4px;margin:18px 0 8px}
+.pp{width:100%;aspect-ratio:24/30;fill:var(--soft);stroke:var(--ink);stroke-width:1.5}
+.pp.f{fill:var(--tint)}
+.pp.q{fill:var(--yellow)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;color:var(--mute)}
+.legend .pp{width:12px;height:15px;margin-right:6px;vertical-align:-3px}
+
+/* calculator receipt */
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+.inputs{display:grid;gap:26px}
+.field label{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:10px}
+.field label b{font-family:var(--mono);font-size:20px;font-weight:600}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:10px;background:var(--card);border:var(--line);border-radius:999px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--red);border:var(--line);box-shadow:2px 2px 0 var(--ink);cursor:grab}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--red);border:var(--line);cursor:grab}
+.receipt{background:var(--card);border:var(--line);box-shadow:var(--shadow);padding:30px 30px 26px;font-family:var(--mono);font-size:15px;position:relative;transform:rotate(-.8deg)}
+.receipt::after{content:"";position:absolute;left:-2px;right:-2px;bottom:-14px;height:14px;
+  background:linear-gradient(-45deg,transparent 7px,var(--card) 0) 0 0/14px 14px repeat-x,linear-gradient(45deg,transparent 7px,var(--card) 0) 0 0/14px 14px repeat-x}
+.receipt h4{font-size:13px;letter-spacing:.14em;text-align:center;margin-bottom:18px}
+.spend{display:flex;justify-content:space-between;padding-bottom:14px;margin-bottom:6px;border-bottom:1.5px dashed var(--faint)}
+.stage{padding:12px 0;border-bottom:1.5px dashed var(--faint)}
+.st-top{display:flex;justify-content:space-between;gap:10px}
+.st-top b{font-weight:600}
+.bar{height:14px;border:1.5px solid var(--ink);background:var(--soft);margin:7px 0 6px}
+.bar i{display:block;height:100%;transition:width .25s}
+.st-cost{display:flex;justify-content:space-between;color:var(--mute);font-size:13px}
+.st-cost b{color:var(--ink);font-weight:600}
+.cpa{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-top:16px}
+.cpa span:last-child{font-family:var(--serif);font-weight:800;font-size:44px;color:var(--red);letter-spacing:-.02em;line-height:1}
+.receipt small{display:block;margin-top:14px;color:var(--mute);font-size:12px;line-height:1.5}
+
+/* loop / how it works */
+.loop{position:relative}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:22px;list-style:none;position:relative;z-index:2}
+.step{background:var(--card);border:var(--line);box-shadow:var(--shadow);padding:20px 18px 22px;position:relative}
+.step .n{font-family:var(--mono);font-size:12px;color:var(--mute)}
+.ic{display:block;width:88px;height:66px;margin:10px 0 4px;fill:none;stroke:var(--ink);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;overflow:visible}
+.step h3{font-size:20px;line-height:1.15;margin:8px 0 10px;letter-spacing:-.01em}
+.step p{font-size:15px;line-height:1.5}
+.step code{font-family:var(--mono);font-size:12.5px;background:var(--soft);border:1px solid var(--shade);padding:0 4px}
+.step:not(:last-child)::after{content:"";position:absolute;right:-21px;top:44px;width:20px;height:2px;background:var(--ink)}
+.step.hot{background:var(--yellow)}
+.return{display:block;width:100%;height:120px;margin-top:-6px;overflow:visible}
+.return-path{fill:none;stroke:var(--red);stroke-width:3;stroke-linecap:round;stroke-dasharray:1200;stroke-dashoffset:1200;transition:stroke-dashoffset 2.2s cubic-bezier(.6,0,.2,1)}
+.loop.on .return-path{stroke-dashoffset:0}
+.plane{opacity:0;transition:opacity .3s 1.8s}
+.loop.on .plane{opacity:1}
+.return-label{font-family:var(--mono);font-size:13px;letter-spacing:.1em;fill:var(--ink)}
+.callout{margin:28px auto 0;max-width:720px;text-align:center;font-size:22px}
+.callout em{background:linear-gradient(transparent 58%,var(--yellow) 0)}
+
+/* trade */
+.trade{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.metric{background:var(--card);border:var(--line);box-shadow:var(--shadow);padding:26px;text-align:center}
+.metric .arrow{font-family:var(--mono);font-size:56px;line-height:1;font-weight:600}
+.metric.up .arrow{color:var(--red)}
+.metric.down .arrow{color:var(--blue)}
+.metric h3{font-size:22px;margin:6px 0 8px}
+.metric p{font-size:15px;color:var(--mute)}
+.honest{margin-top:34px;border-left:4px solid var(--ink);padding:6px 0 6px 20px;max-width:70ch}
+
+/* proof table */
+.proof{width:100%;border-collapse:collapse;background:var(--card);border:var(--line);box-shadow:var(--shadow)}
+.proof th,.proof td{text-align:left;padding:16px 18px;border-bottom:1.5px solid var(--shade);vertical-align:top;font-size:16px}
+.proof th{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;background:var(--soft);border-bottom:var(--line)}
+.proof td.res{font-family:var(--mono);font-weight:600;white-space:nowrap}
+.pass{display:inline-block;background:var(--yellow);border:1.5px solid var(--ink);padding:1px 8px;margin-right:6px}
+.proof a{font-family:var(--mono);font-size:13px}
+.limit{margin-top:26px;max-width:70ch;border-left:4px solid var(--ink);padding:4px 0 4px 18px}
+
+/* pilot */
+.pilot{display:grid;grid-template-columns:1.2fr 1fr;gap:28px;align-items:stretch}
+.ticket{background:var(--card);border:var(--line);box-shadow:8px 8px 0 var(--ink);padding:34px;position:relative}
+.ticket .stamp{position:absolute;top:22px;right:22px;transform:rotate(8deg);border:3px solid var(--red);color:var(--red);font-family:var(--mono);font-weight:600;font-size:13px;letter-spacing:.14em;padding:6px 10px}
+.ticket h3{font-size:30px;letter-spacing:-.02em;margin:10px 0 18px;max-width:16ch}
+.ticket ol{list-style:none;counter-reset:i;display:grid;gap:14px}
+.ticket li{counter-increment:i;display:grid;grid-template-columns:34px 1fr;gap:10px}
+.ticket li::before{content:counter(i,decimal-leading-zero);font-family:var(--mono);font-size:13px;padding-top:4px;color:var(--mute)}
+.side{display:grid;gap:22px}
+.side .card{box-shadow:var(--shadow-sm);padding:22px}
+.side h4{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+.side .done h4{color:var(--blue)}
+.side .no h4{color:var(--red)}
+
+/* faq */
+.faq{display:grid;gap:14px;max-width:860px}
+details{background:var(--card);border:var(--line);box-shadow:var(--shadow-sm)}
+summary{list-style:none;cursor:pointer;padding:18px 22px;font-weight:600;font-size:20px;display:flex;justify-content:space-between;gap:16px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-family:var(--mono);font-size:24px;line-height:1;transition:transform .2s}
+details[open] summary::after{transform:rotate(45deg)}
+details p{padding:0 22px 20px;max-width:70ch}
+
+/* sale signal: roads, buyer keys, quiz */
+.road{display:flex;align-items:center;gap:8px;margin:16px 0 12px}
+.road-dot{font-family:var(--mono);font-size:12px;border:1.5px solid var(--ink);border-radius:999px;padding:3px 10px;background:var(--soft)}
+.road-dot.on{background:var(--yellow)}
+.road-dot.off{opacity:.45;text-decoration:line-through}
+.keys{display:flex;flex-wrap:wrap;gap:6px}
+.key{font-family:var(--mono);font-size:12px;border:1.5px dashed var(--faint);color:var(--faint);padding:4px 8px;background:transparent}
+.key.on{border:1.5px solid var(--ink);color:var(--ink);background:var(--tint)}
+.card.good .key.on{background:var(--yellow)}
+.keys-n{margin:12px 0 10px;font-family:var(--mono);font-size:13px}
+.keys-n b{font-family:var(--serif);font-size:30px;font-weight:800;margin-right:6px}
+.quiz{gap:18px}
+.q{background:var(--card);border:var(--line);box-shadow:var(--shadow-sm);padding:16px 18px}
+.q p{font-size:17px;margin-bottom:12px}
+.ans{display:flex;gap:8px;flex-wrap:wrap}
+.ans button{font-family:var(--mono);font-size:13px;font-weight:600;border:var(--line);background:var(--soft);padding:7px 14px;border-radius:999px;cursor:pointer}
+.ans button.on{background:var(--ink);color:var(--paper)}
+.ans button:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.fixlist{list-style:none;counter-reset:f;display:grid;gap:12px;margin:14px 0 4px;font-size:14px;line-height:1.5}
+.fixlist li{counter-increment:f;display:grid;grid-template-columns:28px 1fr;gap:8px}
+.fixlist li::before{content:counter(f,decimal-leading-zero);color:var(--red);font-weight:600}
+.fixlist li.mute{display:block;color:var(--mute)}
+.fixlist li.mute::before{content:none}
+@media (min-width:981px){#cost .receipt{position:sticky;top:96px}}
+#leaks{font-family:var(--serif);font-size:28px;color:var(--red)}
+/* about + final */
+.about{display:grid;grid-template-columns:1fr 1.3fr;gap:48px;align-items:center}
+.facts{list-style:none;display:grid;gap:12px}
+.facts li{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:baseline;border-bottom:1.5px dashed var(--faint);padding-bottom:12px}
+.facts b{font-family:var(--mono);font-size:13px;color:var(--mute);min-width:84px}
+.final{background:var(--ink);color:var(--paper);text-align:center;border-top:none}
+.final h2{margin:0 auto;max-width:20ch;color:var(--paper)}
+.final p{margin:20px auto 34px;max-width:52ch;color:#d8cfbd;font-size:20px}
+.final .btn{box-shadow:4px 4px 0 var(--ink);border-color:var(--ink)}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;text-align:left}
+.final .contact-copy h2{margin:8px 0 0;max-width:16ch}
+.final .contact-copy p{margin:20px 0 28px;max-width:40ch}
+.two-steps{list-style:none;display:grid;gap:12px;color:#d8cfbd}
+.two-steps li{display:flex;align-items:center;gap:12px}
+.two-steps b{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--yellow);color:var(--ink)}
+.form-card{background:var(--card);color:var(--ink);border:var(--line);border-color:var(--paper);box-shadow:8px 8px 0 var(--red);padding:30px}
+.step-tag{display:block;margin-bottom:16px;font-size:12px}
+.f{margin-bottom:16px}
+.f label{display:block;font-size:16px;margin-bottom:6px;font-weight:600}
+.f label .mute{font-weight:400}
+.f input{width:100%;font:inherit;font-size:17px;padding:12px 14px;border:var(--line);background:#fff;border-radius:0;box-shadow:inset 2px 2px 0 var(--shade)}
+.f input:focus{outline:3px solid var(--blue);outline-offset:1px}
+.f input[aria-invalid=true]{border-color:var(--red);background:#fff5f2}
+.form-err{color:var(--red);font-family:var(--mono);font-size:13px;min-height:18px;margin:-4px 0 10px}
+.form-card .btn{width:100%;justify-content:center}
+.privacy{display:block;margin-top:14px;font-family:var(--mono);font-size:11.5px;line-height:1.5;color:var(--mute)}
+#bookStep h3{font-size:24px;margin-bottom:16px}
+#calInline{width:100%;min-height:560px;border:var(--line);background:#fff}
+.final .cal-alt{margin:12px 0 0;max-width:none;font-family:var(--mono);font-size:12px;color:var(--mute)}
+.final .cal-alt a{color:var(--ink)}
+.contact-grid.booking{grid-template-columns:1fr;gap:32px}
+.contact-grid.booking .contact-copy p,.contact-grid.booking .two-steps{display:none}
+.contact-grid.booking .contact-copy h2{max-width:none}
+.guarantee-line{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-top:22px}
+.seal{display:inline-block;transform:rotate(-2deg);border:3px solid var(--red);color:var(--red);font-family:var(--mono);font-weight:600;font-size:13px;letter-spacing:.1em;text-transform:uppercase;padding:6px 12px;background:var(--card)}
+.side .guarantee{border-color:var(--red);box-shadow:5px 5px 0 var(--red)}
+.side .guarantee h4{color:var(--red)}
+.g-big{font-size:26px;font-weight:800;letter-spacing:-.01em;line-height:1.15;margin-bottom:10px}
+.final .sibling{margin:56px auto 0;max-width:none;text-align:center;font-family:var(--mono);font-size:13px;color:#d8cfbd}
+.sibling a{color:var(--yellow)}
+footer{padding:28px 0 40px;font-family:var(--mono);font-size:12px;color:var(--mute);border-top:var(--line)}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(16px);transition:opacity .6s,transform .6s}
+.rv.on{opacity:1;transform:none}
+
+/* ---------- responsive ---------- */
+@media (max-width:980px){
+  nav ul{display:none}
+  .hero-grid,.calc,.pilot,.about,.contact-grid{grid-template-columns:1fr}
+  .player-note{display:none}
+  .steps{grid-template-columns:1fr;gap:18px;padding-left:44px}
+  .step:not(:last-child)::after{right:auto;left:40px;top:auto;bottom:-19px;width:2px;height:18px}
+  .return{display:none}
+  .steps::before{content:"";position:absolute;left:14px;top:30px;bottom:30px;width:3px;background:var(--red);border-radius:2px}
+  .steps::after{content:"signal back";position:absolute;left:-6px;top:50%;transform:rotate(-90deg) translateX(-50%);transform-origin:left top;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;background:var(--paper);padding:0 6px;color:var(--red)}
+  .trade{grid-template-columns:1fr}
+  .versus{grid-template-columns:1fr}
+  .sec-head{grid-template-columns:1fr;gap:16px}
+}
+@media (max-width:640px){
+  body{font-size:17px}
+  section{padding:68px 0}
+  .hero{padding:44px 0 64px}
+  .lead{font-size:19px}
+  .proof thead{display:none}
+  .proof,.proof tbody,.proof tr,.proof td{display:block;width:100%}
+  .proof tr{border-bottom:var(--line);padding:6px 0}
+  .proof td{border:none;padding:6px 16px}
+  .proof td.res{white-space:normal}
+  .ticket{padding:26px 22px}
+  .form-card{padding:22px}
+  .ticket .stamp{position:static;display:inline-block;margin-bottom:8px}
+  .crowd{grid-template-columns:repeat(10,1fr)}
+  nav .btn{padding:8px 12px;font-size:11px}
+  .logo{font-size:20px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .rv{opacity:1;transform:none;transition:none}
+  .return-path{stroke-dashoffset:0;transition:none}
+  .plane{opacity:1;transition:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="logo" href="#top">sale<b>-</b>signal fix</a>
+    <ul>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#proof">Proof</a></li>
+      <li><a href="#pilot">The fix</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <a class="btn btn-red" href="#contact">Book a call</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow mono">For stores and info products that sell with Meta ads</span>
+      <h1>Meta counts your sales. It just doesn't know <span class="strike">who bought.<svg viewBox="0 0 200 18" preserveAspectRatio="none" aria-hidden="true"><path d="M3 12 C 50 3, 110 17, 197 6" fill="none" stroke="#ef4e36" stroke-width="5" stroke-linecap="round"/></svg></span></h1>
+      <p class="lead">I audit how your sales reach Meta and fix what the audit finds. Every sale arrives once, with the buyer attached, so the campaign learns who to show the ad to next.</p>
+      <div class="cta-row">
+        <a class="btn btn-red" href="#contact">Book a 15-min call</a>
+        <a class="btn" href="#demo" data-open>&#9654; Watch the 71s demo</a>
+      </div>
+      <p class="guarantee-line"><span class="seal">It works or you don't pay</span><span class="mono mute">Fixed in 3 business days after access</span></p>
+      <div class="stack">
+        <span class="chip">Meta Pixel</span><span class="chip">Conversions API</span><span class="chip">Own checkout</span><span class="chip">Shopify</span><span class="chip">Hotmart · Kiwify · Eduzz</span>
+      </div>
+    </div>
+    <div id="demo">
+      <div class="player">
+        <div class="player-bar"><i></i><i></i><i></i><span class="mono mute">demo · 71s · no voice</span></div>
+        <button class="poster" data-open aria-label="Play the 71-second demo"><img src="media/poster.jpg" alt="Sale Signal Fix demo: Meta ads, people, checkout, your server, and the sale back to Meta with the buyer attached"></button>
+      </div>
+      <p class="hand player-note">fictional buyer, real Meta screens &#8599;</p>
+    </div>
+  </div>
+</header>
+
+<section id="problem">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="sec-num">01</span>
+      <div>
+        <h2>The sale shows up in Ads Manager. The buyer doesn't.</h2>
+        <p>In many setups the sale reaches Meta by one road only, with few details about the buyer. Meta counts it and can't tell well who bought. And when Meta's API is down for a moment, the sale is just lost.</p>
+      </div>
+    </div>
+    <div class="versus">
+      <div class="card bad rv">
+        <span class="mono">Today · what Meta gets</span>
+        <h3>"Someone bought. No idea who."</h3>
+        <div class="road"><span class="road-dot off">browser</span><span class="road-dot on">server</span><span class="mono mute">1 road</span></div>
+        <div class="keys"><span class="key on">e-mail</span><span class="key on">phone</span><span class="key on">click id</span><span class="key on">user agent</span><span class="key">first name</span><span class="key">last name</span><span class="key">country</span><span class="key">external id</span><span class="key">browser id</span></div>
+        <p class="keys-n"><b>4</b> buyer keys on Meta's Test Events</p>
+        <p>Meta API down? The sale is lost. Slow? The checkout waits for Meta.</p>
+      </div>
+      <div class="card good rv">
+        <span class="mono">After the fix · what Meta gets</span>
+        <h3>"This buyer. Find more like them."</h3>
+        <div class="road"><span class="road-dot on">browser</span><span class="road-dot on">server</span><span class="mono mute">2 roads, 1 order id</span></div>
+        <div class="keys"><span class="key on">e-mail</span><span class="key on">phone</span><span class="key on">click id</span><span class="key on">user agent</span><span class="key on">first name</span><span class="key on">last name</span><span class="key on">country</span><span class="key on">external id</span><span class="key on">browser id</span></div>
+        <p class="keys-n"><b>9</b> buyer keys on Meta's Test Events</p>
+        <p>Meta API down? The sale waits in a queue and goes later. The checkout doesn't wait.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="cost">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="sec-num">02</span>
+      <div>
+        <h2>Is your setup leaking? 4 questions, 30 seconds.</h2>
+        <p>Answer for your own account. Nothing is sent anywhere.</p>
+      </div>
+    </div>
+    <div class="calc">
+      <div class="inputs quiz"><div class="q rv" data-q="browser" data-fix="Only one road: Meta gets less signal, and nothing can be deduplicated."><p>Does each sale reach Meta from the browser Pixel <em>and</em> from your server (Conversions API)?</p><div class="ans"><button type="button" data-a="yes">Yes</button><button type="button" data-a="no">No</button><button type="button" data-a="unsure">Not sure</button></div></div><div class="q rv" data-q="dedup" data-fix="Sales may be counted twice, or one road is missing. Either way Meta learns from noisy data."><p>In Events Manager, does your Purchase show as <em>Deduplicated</em>?</p><div class="ans"><button type="button" data-a="yes">Yes</button><button type="button" data-a="no">No</button><button type="button" data-a="unsure">Not sure</button></div></div><div class="q rv" data-q="keys" data-fix="Few buyer keys: Meta can't match the sale to a person, so it can't find more people like your buyers."><p>Does the server send more than e-mail and phone (name, country, external id, browser id, click id)?</p><div class="ans"><button type="button" data-a="yes">Yes</button><button type="button" data-a="no">No</button><button type="button" data-a="unsure">Not sure</button></div></div><div class="q rv" data-q="retry" data-fix="No retry: every Meta outage loses sales for good, and nobody sees it."><p>If Meta's API fails for 10 minutes, are those sales sent again later?</p><div class="ans"><button type="button" data-a="yes">Yes</button><button type="button" data-a="no">No</button><button type="button" data-a="unsure">Not sure</button></div></div></div>
+      <div class="receipt rv" aria-live="polite">
+        <h4>Your tracking check</h4>
+        <div class="spend"><span>Leaks found</span><b id="leaks">0 of 4</b></div>
+        <ol class="fixlist" id="fixlist"><li class="mute">Answer the questions to see what to fix.</li></ol>
+        <small>"Not sure" counts as a leak. Many accounts can't answer these from Ads Manager alone. That's what the audit is for.</small>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="sec-num">03</span>
+      <div>
+        <h2>Audit, fix, and proof on Meta's own screen.</h2>
+        <p>It works on the checkout you already have. Nothing to rebuild.</p>
+      </div>
+    </div>
+    <div class="loop" id="loop">
+      <ol class="steps">
+        <li class="step rv"><span class="n">01 · audit</span><svg class="ic" viewBox="0 0 76 58" aria-hidden="true"><rect x="4" y="6" width="44" height="38" rx="3" fill="#fbf6ec"/><path d="M4 14h44"/><path d="M11 22h16M11 28h24M11 34h12"/><circle cx="52" cy="34" r="12" fill="#f5c033"/><path d="M61 43l11 11" stroke-width="4"/><path d="M47 34l4 4 7-8"/></svg><h3>I look at what leaves</h3><p>I check what actually reaches Meta from your browser and your server, on a real test order. Not a code reading.</p></li><li class="step rv"><span class="n">02 · two roads</span><svg class="ic" viewBox="0 0 76 58" aria-hidden="true"><rect x="3" y="4" width="26" height="20" rx="2" fill="#bfcaf0"/><path d="M3 10h26"/><rect x="3" y="34" width="26" height="20" rx="2" fill="#fbf6ec"/><path d="M9 41h14M9 47h10"/><path d="M29 14c14 0 16 14 26 14M29 44c14 0 16-16 26-16" stroke="#ef4e36"/><circle cx="62" cy="28" r="9" fill="#f5c033"/><path d="M58 28h8"/></svg><h3>One sale, two roads</h3><p>The Pixel and the Conversions API send the same sale with the same <code>event_id</code>. Meta counts it once.</p></li><li class="step rv"><span class="n">03 · buyer</span><svg class="ic" viewBox="0 0 76 58" aria-hidden="true"><rect x="4" y="6" width="68" height="46" rx="4" fill="#fbf6ec"/><circle cx="21" cy="24" r="7" fill="#f5c033"/><path d="M10 42c2-8 20-8 22 0"/><path d="M40 18h24M40 26h24M40 34h18M40 42h22"/></svg><h3>More about the buyer</h3><p>Name, country, external id, browser id and click id, normalized and hashed the way Meta asks.</p></li><li class="step rv"><span class="n">04 · queue</span><svg class="ic" viewBox="0 0 76 58" aria-hidden="true"><rect x="4" y="18" width="40" height="30" fill="#fbf6ec"/><path d="M4 18l20 16 20-16"/><circle cx="56" cy="20" r="14" fill="#f5c033"/><path d="M56 12v8l5 4"/><path d="M40 52c10 4 22 0 28-10" stroke="#ef4e36" stroke-dasharray="4 4"/></svg><h3>No lost sales</h3><p>An outbox with retry holds the sale when Meta is down. The checkout stops waiting on Meta.</p></li><li class="step hot rv"><span class="n">05 · proof</span><svg class="ic" viewBox="0 0 76 58" aria-hidden="true"><rect x="3" y="4" width="70" height="42" rx="3" fill="#fbf6ec"/><path d="M30 46l-4 8h24l-4-8"/><rect x="14" y="16" width="48" height="18" transform="rotate(-6 38 25)" fill="none" stroke="#2c4bc0" stroke-width="3"/><path d="M22 26l5 5 9-10" stroke="#2c4bc0" stroke-width="3"/></svg><h3>Checked on Meta's screen</h3><p>Before and after on your Test Events: <em>Deduplicated</em>, and more buyer keys. We look at it together.</p></li>
+      </ol>
+      <svg class="return" viewBox="0 0 1072 120" preserveAspectRatio="none" aria-hidden="true">
+        <path class="return-path" d="M965 4 C 965 90, 900 104, 800 104 L 270 104 C 170 104, 107 90, 107 10"/>
+        <path class="plane" d="M100 2 l14 22 l-14 -6 l-14 6 z" fill="#f5c033" stroke="#1c1a18" stroke-width="2" stroke-linejoin="round"/>
+        <text class="return-label" x="536" y="94" text-anchor="middle">SALE + BUYER &#8594; META &#8594; ADS GO TO PEOPLE LIKE YOUR BUYERS</text>
+      </svg>
+      <p class="callout rv">Step 3 is what changes the campaign. <em>When Meta knows who bought, it finds more people like your real buyers.</em></p>
+    </div>
+  </div>
+</section>
+
+<section id="trade">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="sec-num">04</span>
+      <div>
+        <h2>What changes when Meta knows who bought.</h2>
+        <p>The campaign stops guessing. The more budget you spend, the more that matters.</p>
+      </div>
+    </div>
+    <div class="trade">
+      <div class="metric down rv"><div class="arrow">&#8593;</div><h3>Sales matched to a person</h3><p>More buyer keys per sale, and no sale lost when Meta is down.</p></div>
+      <div class="metric down rv"><div class="arrow">&#8595;</div><h3>Cost per sale</h3><p>The direction, when the ad goes to people like your buyers.</p></div>
+      <div class="metric down rv"><div class="arrow">&#8593;</div><h3>ROAS</h3><p>Same direction. And a campaign that learns faster from every sale.</p></div>
+    </div>
+    <p class="honest rv">I don't promise a number here. Results also depend on offer, creative and budget. What I promise is the fix working, checked with you on Meta's Test Events before and after.</p>
+  </div>
+</section>
+
+<section id="proof">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="sec-num">05</span>
+      <div>
+        <h2>Proof that it runs, not slides.</h2>
+        <p>Every check below is written down in the public repo, step by step.</p>
+      </div>
+    </div>
+    <table class="proof rv">
+      <thead><tr><th>What I tested</th><th>Result</th><th>Report</th></tr></thead>
+      <tbody>
+        <tr><td>Audit of an open-source sales funnel. Every finding checked on what actually left the server</td><td class="res"><span class="pass">PASS</span>7 of 7 gaps found</td><td><a href="https://github.com/Ramon-nassa/sale-signal-fix-demo/blob/main/proof/AUDIT.md">AUDIT.md</a></td></tr>
+        <tr><td>Meta Test Events, test pixel, fictional buyer: Purchase and InitiateCheckout</td><td class="res"><span class="pass">PASS</span>Deduplicated</td><td><a href="https://github.com/Ramon-nassa/sale-signal-fix-demo/blob/main/proof/AUDIT.md#4-proof-on-metas-own-screens-test-pixel-2026-11-21">AUDIT.md</a></td></tr>
+        <tr><td>Buyer keys Meta shows on Test Events. Event Match Quality 7.7 on the test dataset</td><td class="res"><span class="pass">PASS</span>4 &#8594; 9 keys</td><td><a href="https://github.com/Ramon-nassa/sale-signal-fix-demo/blob/main/proof/AUDIT.md#4-proof-on-metas-own-screens-test-pixel-2026-11-21">AUDIT.md</a></td></tr>
+        <tr><td>Meta outage simulated: API returns errors, then a 3 s delay</td><td class="res"><span class="pass">PASS</span>0 sales lost</td><td><a href="https://github.com/Ramon-nassa/sale-signal-fix-demo/blob/main/proof/evidence-after.json">evidence-after.json</a></td></tr>
+        <tr><td>Checkout time when Meta is slow</td><td class="res"><span class="pass">PASS</span>3.01 s &#8594; 0.01 s</td><td><a href="https://github.com/Ramon-nassa/sale-signal-fix-demo/blob/main/proof/evidence-after.json">evidence-after.json</a></td></tr>
+      </tbody>
+    </table>
+    <p class="limit rv">Fictional buyer and a Meta test pixel. It proves the fix on Meta's own screens. It doesn't prove a client result yet. The audited funnel is <a href="https://github.com/thiagopatzdorf/funil-aberto">funil-aberto</a> (MIT): the findings are about tracking, not about the quality of the project.</p>
+  </div>
+</section>
+
+<section id="pilot">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="sec-num">06</span>
+      <div>
+        <h2>Fixed in 3 business days. It works or you don't pay.</h2>
+        <p>The audit and the fix are already built and tested. I run them on your setup, so you are not paying for something made from zero. The 3 days start when I have access to your Meta account and checkout.</p>
+      </div>
+    </div>
+    <div class="pilot">
+      <div class="ticket rv">
+        <span class="stamp">FIXED PRICE</span>
+        <span class="mono mute">The fix includes</span>
+        <h3>Your sales reach Meta once, with the buyer attached.</h3>
+        <ol>
+          <li><span>An audit of what reaches Meta today, from the browser and from your server.</span></li>
+          <li><span>Pixel and Conversions API with the same <code>event_id</code>, so Meta deduplicates.</span></li>
+          <li><span>More buyer keys, normalized and hashed the way Meta asks.</span></li>
+          <li><span>A queue with retry, so no sale is lost when Meta is down.</span></li>
+          <li><span>Before and after on your Test Events, and a short handover.</span></li>
+        </ol>
+      </div>
+      <div class="side">
+        <div class="card guarantee rv"><h4>The guarantee</h4><p class="g-big">It works or you don't pay.</p><p>"Works" means your Purchase shows as Deduplicated on Meta's Test Events, and Meta gets more buyer keys than before. We check it together on a call. If it doesn't, you don't pay for the service.</p></div>
+        <div class="card rv"><h4>Price</h4><p>Fixed, agreed before we start, for the scope above. No hourly meter.</p></div>
+        <div class="card no rv"><h4>What I don't promise</h4><p>A ROAS or CPA number. I promise the fix working, and the before and after on Meta's own screen.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="sec-num">07</span>
+      <div><h2>What people ask before the call.</h2></div>
+    </div>
+    <div class="faq">
+      <details class="rv"><summary>Does it work with Shopify, Hotmart, Kiwify or Eduzz?</summary><p>The audit is the same on any checkout. On an own checkout I fix all of it. On hosted checkouts the fix goes as far as each platform lets you configure, and I tell you what is possible in the audit, before we go on.</p></details>
+      <details class="rv"><summary>How long does it take?</summary><p>3 business days after you give access to your Meta account and your checkout. I send you a step by step for the access.</p></details>
+      <details class="rv"><summary>Will my sales count twice in Ads Manager?</summary><p>No. Both roads send the same sale with the same order id, and Meta keeps one. That is what Deduplicated means.</p></details>
+      <details class="rv"><summary>What happens with my customers' data?</summary><p>Buyer data is normalized and hashed with SHA-256 before it leaves your server, the way Meta asks.</p></details>
+      <details class="rv"><summary>Do I need to change my checkout?</summary><p>No. The Pixel goes on your pages and the server part goes next to the checkout you already run. Your buyer doesn't see any change, except a faster checkout when Meta is slow.</p></details>
+      <details class="rv"><summary>And Google Ads?</summary><p>It's next, as a separate module using the same buyer data.</p></details>
+      <details class="rv"><summary>Can I see the code?</summary><p>The audit and the proof are public on GitHub. The code is private for now, and I walk through it and run it live on a call.</p></details>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap about">
+    <div class="rv">
+      <span class="sec-num">08</span>
+      <h2 style="margin-top:24px">Built by someone who paid for the leads.</h2>
+    </div>
+    <div class="rv">
+      <p style="font-size:20px;margin-bottom:24px">I'm Ramon, a growth lead who builds. For 4 years I ran Meta and Google Ads for lead gen and e-commerce, and I answered for the number. Today I turn that repeated work into AI systems that run every day.</p>
+      <ul class="facts">
+        <li><b>Agency</b><span>Paid media for 50+ clients at a high-ticket performance agency in Brazil. I fixed this kind of tracking in client accounts before.</span></li>
+        <li><b>Ad spend</b><span>About $1M per year in ad spend at a US DTC brand.</span></li>
+        <li><b>Head role</b><span>Promoted to a Head role twice, in under 6 months.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="final" id="contact">
+  <div class="wrap contact-grid">
+    <div class="contact-copy">
+      <span class="hand" style="color:var(--yellow)">15 minutes, your numbers</span>
+      <h2>Show me your checkout. I'll tell you where the sale signal breaks.</h2>
+      <p>Leave your details and pick a time. On the call I show you what I would check first in your account.</p>
+      <ol class="two-steps mono"><li><b>1</b>Your details</li><li><b>2</b>Pick a time for the call</li></ol>
+    </div>
+    <div class="form-card">
+      <form id="leadForm" novalidate>
+        <span class="mono mute step-tag">Step 1 of 2 · about you</span>
+        <div class="f"><label for="f-name">Name</label><input id="f-name" name="name" autocomplete="name" required></div>
+        <div class="f"><label for="f-email">Work email</label><input id="f-email" name="email" type="email" autocomplete="email" required></div>
+        <div class="f"><label for="f-company">Company</label><input id="f-company" name="company" autocomplete="organization" required></div>
+        <div class="f"><label for="f-phone">Phone <span class="mute">(WhatsApp is fine)</span></label><input id="f-phone" name="phone" type="tel" autocomplete="tel"></div>
+        <p class="form-err" id="formErr" role="alert"></p>
+        <button class="btn btn-red" type="submit">Next: pick a time &#8594;</button>
+        <small class="privacy">I only use your details to reply to you.</small>
+      </form>
+      <div id="bookStep" hidden>
+        <span class="mono mute step-tag">Step 2 of 2 · pick a time</span>
+        <h3 id="bookTitle">Thanks. Now pick a time for the call.</h3>
+        <div id="bookSlot"></div>
+      </div>
+    </div>
+  </div>
+  <div class="wrap"><p class="sibling">Selling with lead forms instead of a checkout? See <a href="../lead-signal-engine/">Lead Signal Engine</a>: your qualified leads go back to Meta and Google, so the campaign finds more of them.</p></div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Ramon Nassaralla · Growth lead who builds</span>
+    <span>All people, companies and data in the demo are fictional.</span>
+  </div>
+</footer>
+
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-label="Sale Signal Fix demo">
+  <div class="modal-box">
+    <button class="modal-close" id="modalClose" aria-label="Close video">&#215;</button>
+    <video id="vid" controls playsinline preload="none" poster="media/poster.jpg">
+      <source src="media/sale-signal-fix.mp4" type="video/mp4">
+    </video>
+  </div>
+</div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="person" viewBox="0 0 24 30"><circle cx="12" cy="8" r="5.4"/><path d="M2.5 29.2v-5c0-5.6 4.3-9.6 9.5-9.6s9.5 4 9.5 9.6v5z"/></symbol></svg>
+
+<script>
+
+// video lightbox
+const modal = document.getElementById("modal"), v = document.getElementById("vid");
+function openVideo(e){ e.preventDefault(); modal.hidden = false; document.body.style.overflow = "hidden"; document.getElementById("modalClose").focus(); v.play().catch(() => {}); }
+function closeVideo(){ v.pause(); modal.hidden = true; document.body.style.overflow = ""; }
+document.querySelectorAll("[data-open]").forEach(el => el.addEventListener("click", openVideo));
+document.getElementById("modalClose").addEventListener("click", closeVideo);
+modal.addEventListener("click", e => { if (e.target === modal) closeVideo(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !modal.hidden) closeVideo(); });
+
+// Cal.com official inline embed (a plain iframe of the booking page renders blank)
+function loadCal(calLink, prefill){
+  (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if (typeof namespace === "string") { cal.ns[namespace] = cal.ns[namespace] || api; p(cal.ns[namespace], ar); p(cal, ["initNamespace", namespace]); } else p(cal, ar); return; } p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
+  Cal("init", { origin: "https://cal.com" });
+  Cal("inline", { elementOrSelector: "#calInline", calLink, config: Object.assign({ layout: "month_view", theme: "light" }, prefill) });
+  Cal("ui", { theme: "light", hideEventTypeDetails: false, layout: "month_view" });
+}
+
+// ---------- lead form: 2 steps, saves every field as it is typed ----------
+// Fill these two after setup (see form-backend/SETUP.md). Empty = form still works, nothing is sent.
+const LEAD_ENDPOINT = "https://script.google.com/macros/s/AKfycbwtx-T8Z5aDZJ7q5qH3r36l_KZwVJz45fDrl2ytNaP0oW06nv3nZZQIKM1p8r7_CiMD/exec";   // Google Apps Script web app URL (ends in /exec)
+const BOOKING_URL = "https://cal.com/ramon-nassaralla/15min";     // booking page, e.g. https://cal.com/<you>/15min
+
+(function(){
+  const KEY = "lse_lead", CLICK = "lse_click", DAY = 864e5;
+  const form = document.getElementById("leadForm");
+  const fields = ["name","email","company","phone"];
+  const store = JSON.parse(localStorage.getItem(KEY) || "{}");
+  if (!store.sid) store.sid = (crypto.randomUUID ? crypto.randomUUID() : Date.now() + "-" + Math.random().toString(36).slice(2));
+  // keep click ids and UTMs for 90 days, like the engine's capture script
+  const qs = new URLSearchParams(location.search), keys = ["gclid","gbraid","wbraid","fbclid","utm_source","utm_medium","utm_campaign","utm_content","utm_term"];
+  let click = JSON.parse(localStorage.getItem(CLICK) || "{}");
+  if (click.t && Date.now() - click.t > 90 * DAY) click = {};
+  keys.forEach(k => { if (qs.get(k)) { click[k] = qs.get(k); click.t = Date.now(); } });
+  localStorage.setItem(CLICK, JSON.stringify(click));
+  fields.forEach(f => { if (store[f]) form.elements[f].value = store[f]; });
+
+  let lastSent = "", timer = null;
+  function payload(stage){
+    const d = { sid: store.sid, offer: "sale-signal-fix", stage, page: location.href.split("#")[0], referrer: document.referrer, ts: new Date().toISOString() };
+    fields.forEach(f => d[f] = form.elements[f].value.trim());
+    keys.forEach(k => d[k] = click[k] || "");
+    return d;
+  }
+  function send(stage, beacon){
+    const d = payload(stage), body = JSON.stringify(d), sig = stage + JSON.stringify(fields.map(f => d[f]));
+    if (stage === "partial" && (sig === lastSent || !fields.some(f => d[f]))) return;
+    lastSent = sig;
+    fields.forEach(f => store[f] = d[f]);
+    localStorage.setItem(KEY, JSON.stringify(store));
+    if (!LEAD_ENDPOINT) return;
+    if (beacon && navigator.sendBeacon) { navigator.sendBeacon(LEAD_ENDPOINT, new Blob([body], {type:"text/plain;charset=utf-8"})); return; }
+    fetch(LEAD_ENDPOINT, { method:"POST", mode:"no-cors", keepalive:true, headers:{ "Content-Type":"text/plain;charset=utf-8" }, body }).catch(() => {});
+  }
+  form.addEventListener("input", e => { e.target.removeAttribute("aria-invalid"); clearTimeout(timer); timer = setTimeout(() => send("partial"), 1200); });
+  form.addEventListener("focusout", () => send("partial"));
+  addEventListener("pagehide", () => { if (!store.done) send("partial", true); });
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden" && !store.done) send("partial", true); });
+
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    const err = [], v = n => form.elements[n].value.trim();
+    if (!v("name")) err.push("name");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v("email"))) err.push("email");
+    if (!v("company")) err.push("company");
+    fields.forEach(f => form.elements[f].toggleAttribute("aria-invalid", err.includes(f)));
+    if (err.length) { document.getElementById("formErr").textContent = "Please check: " + err.join(", ") + "."; form.elements[err[0]].focus(); return; }
+    document.getElementById("formErr").textContent = "";
+    send("submitted"); store.done = true; localStorage.setItem(KEY, JSON.stringify(store));
+    const first = v("name").split(" ")[0];
+    form.hidden = true;
+    document.querySelector(".contact-grid").classList.add("booking");
+    const step = document.getElementById("bookStep"); step.hidden = false;
+    document.getElementById("bookTitle").textContent = "Thanks, " + first + ". Now pick a time for the call.";
+    const slot = document.getElementById("bookSlot");
+    if (BOOKING_URL) {
+      const u = new URL(BOOKING_URL);
+      const prefill = { name: v("name"), email: v("email"), notes: "Sale Signal Fix · Company: " + v("company") };
+      Object.entries(prefill).forEach(([k, val]) => u.searchParams.set(k, val));
+      slot.innerHTML = '<div id="calInline"></div><p class="cal-alt">Calendar not loading? <a href="' + u + '" target="_blank" rel="noopener">Open it in a new tab</a>.</p>';
+      loadCal(u.pathname.replace(/^\//, ""), prefill);
+    } else {
+      document.getElementById("bookTitle").textContent = "Thanks, " + first + ". I got your details.";
+      slot.innerHTML = "<p>I'll email you to set a time for the call.</p>";
+    }
+    step.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+})();
+
+// tracking check: 4 questions, "not sure" counts as a leak
+(function(){
+  const qs = [...document.querySelectorAll(".q")], list = document.getElementById("fixlist"), out = document.getElementById("leaks");
+  const ans = {};
+  function draw(){
+    const leaks = qs.filter(q => ans[q.dataset.q] && ans[q.dataset.q] !== "yes");
+    out.textContent = leaks.length + " of 4";
+    const answered = Object.keys(ans).length;
+    list.innerHTML = !answered ? '<li class="mute">Answer the questions to see what to fix.</li>'
+      : leaks.length ? leaks.map(q => "<li>" + q.dataset.fix + "</li>").join("")
+      : '<li>No leak on these 4. The audit still checks what your answers can\'t see, like what really leaves the server.</li>';
+  }
+  qs.forEach(q => q.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+    ans[q.dataset.q] = b.dataset.a;
+    q.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b));
+    draw();
+  })));
+})();
+
+// reveal + loop drawing
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ e.target.classList.add("on"); io.unobserve(e.target); } }), {threshold:.18});
+document.querySelectorAll(".rv, #loop").forEach(el => io.observe(el));
+</script>
+</body>
+</html>
