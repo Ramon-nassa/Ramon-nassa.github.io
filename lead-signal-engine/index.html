@@ -650,7 +650,7 @@ const BOOKING_URL = "https://cal.com/ramon-nassaralla/15min";     // booking pag
     const slot = document.getElementById("bookSlot");
     if (BOOKING_URL) {
       const u = new URL(BOOKING_URL);
-      const prefill = { name: v("name"), email: v("email"), notes: "Company: " + v("company") };
+      const prefill = { name: v("name"), email: v("email"), notes: "Lead Signal Engine · Company: " + v("company") };
       Object.entries(prefill).forEach(([k, val]) => u.searchParams.set(k, val));
       slot.innerHTML = '<div id="calInline"></div><p class="cal-alt">Calendar not loading? <a href="' + u + '" target="_blank" rel="noopener">Open it in a new tab</a>.</p>';
       loadCal(u.pathname.replace(/^\//, ""), prefill);
