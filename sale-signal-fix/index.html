@@ -228,6 +228,8 @@ details p{padding:0 22px 20px;max-width:70ch}
 .shift b:first-child{color:var(--red)}
 .shift b:last-child{color:var(--blue)}
 .shift span{font-family:var(--mono);font-size:40px;line-height:1}
+.shot.wide{margin-top:44px;display:grid;grid-template-columns:1.5fr 1fr;gap:28px;align-items:center;padding:18px}
+.shot.wide figcaption{padding:0;font-size:18px}
 /* about + final */
 .about{display:grid;grid-template-columns:1fr 1.3fr;gap:48px;align-items:center}
 .facts{list-style:none;display:grid;gap:12px}
@@ -288,6 +290,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   .trade{grid-template-columns:1fr}
   .pains{grid-template-columns:1fr 1fr}
   .shots{grid-template-columns:1fr;gap:34px}
+  .shot.wide{grid-template-columns:1fr}
   .shift{grid-auto-flow:column;gap:14px;justify-content:center}
   .shift span{transform:rotate(90deg)}
   .versus{grid-template-columns:1fr}
@@ -423,6 +426,14 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
         </figcaption>
       </figure>
     </div>
+    <figure class="shot wide rv">
+      <span class="shot-tag good mono">Reported lift · +48.1% · +30.8%</span>
+      <a href="media/capi-lift.jpg" target="_blank" rel="noopener" title="Open full size"><img src="media/capi-lift.jpg" alt="Meta Events Manager: additional conversions reported from the Conversions API, +48.1% and +30.8% versus the pixel alone, with Event Match Quality 7.9 and 9.3" loading="lazy" width="1500" height="1231"></a>
+      <figcaption>
+        <p>Another account, on Meta's own overview. With the server road live and match quality at 7.9 and 9.3, Meta reports <b>+48.1%</b> and <b>+30.8%</b> more conversions from the Conversions API than from the pixel alone.</p>
+        <p class="mute">Those are conversions the pixel alone never saw. Without the server road, the campaign wouldn't learn from them.</p>
+      </figcaption>
+    </figure>
     <p class="callout rv">Meta says it on its own screen. <em>Better buyer data, more of your sales credited back to your ads.</em> Those are the sales your campaign learns from.</p>
   </div>
 </section>
